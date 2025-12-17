@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Open Block</title>
+    <title>FORM OPEN BLOCK - PT. NUSA SARANA INDONESIA</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-	<link rel="icon" type="image/png" href="favicon.png">
     <style>
         body { font-family: 'DM Sans', sans-serif; margin: 0; padding: 30px; background-color: #f4f4f4; }
         .container { width: 800px; margin: 0 auto; background-color: white; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
@@ -32,7 +31,7 @@
         .pdf-button { background-color: #dc3545; }
         .print-button:hover { opacity: 0.9; }
         .error-border { border: 2px solid red !important; }
-        /* Style khusus untuk teks pengganti input saat ekspor tanpa border */
+        /* Style untuk teks hasil ekspor tanpa border */
         .export-text { padding: 4px 0; display: inline-block; border: none !important; }
     </style>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -58,6 +57,7 @@
                 <input type="text" list="daftarPelanggan" id="namaPelangganInput" placeholder="Ketik atau pilih nama pelanggan..." autocomplete="off">
             </div>
             <div class="info-row"><label>Rata-rata Pembayaran</label><span class="separator">:</span><input type="text" id="rataPembayaran" readonly style="background-color: #f0f0f0;"></div>
+
             <div class="info-row"><label>Cara Pembayaran</label><span class="separator">:</span>
                 <select id="caraPembayaran">
                     <option value="">-- Pilih Cara Pembayaran --</option>
@@ -226,6 +226,7 @@
         async function saveAsJpg() {
             const prep = await prepareForExport();
             if (!prep) return;
+            window.scrollTo(0, 0);
             html2canvas(document.getElementById('formContainer'), {scale: 2, useCORS: true}).then(canvas => {
                 prep.replaced.forEach(item => item.parent.replaceChild(item.old, item.new));
                 document.querySelector('.footer-actions').style.display = 'flex';
@@ -240,16 +241,24 @@
         async function saveAsPdf() {
             const prep = await prepareForExport();
             if (!prep) return;
-            html2canvas(document.getElementById('formContainer'), {scale: 2, useCORS: true}).then(canvas => {
+            window.scrollTo(0, 0);
+            html2canvas(document.getElementById('formContainer'), {
+                scale: 2, 
+                useCORS: true,
+                scrollY: -window.scrollY
+            }).then(canvas => {
                 prep.replaced.forEach(item => item.parent.replaceChild(item.old, item.new));
                 document.querySelector('.footer-actions').style.display = 'flex';
+                
                 const { jsPDF } = window.jspdf;
-                // PDF disesuaikan untuk memuat semua data persis JPG
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                
                 const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                const imgWidth = pdfWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
                 pdf.save(`Pengajuan Open Block - ${prep.originalValues.nama} - ${getFormattedDate()}.pdf`);
                 alert('File PDF tersimpan.');
             });
