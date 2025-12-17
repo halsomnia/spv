@@ -11,13 +11,36 @@
         .logo { font-size: 20px; font-weight: bold; color: #004d99; display: flex; align-items: center; }
         .doc-info { text-align: right; font-size: 14px; font-weight: bold; }
         h1 { text-align: center; font-size: 18px; margin-top: 5px; margin-bottom: 30px; }
-        .info-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 20px; margin-bottom: 20px; }
-        .info-section > div { display: flex; align-items: center; }
-        .info-section label { width: 150px; font-weight: normal; white-space: nowrap; flex-shrink: 0; }
-        .info-section .separator { margin: 0 10px; width: 10px; text-align: center; flex-shrink: 0; }
-        .info-section select, .info-section input { 
-            flex-grow: 1; padding: 4px; border: 1px solid #ccc; font-family: Arial, sans-serif;
+        /* Perubahan pada info-section */
+        .info-section { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            margin-bottom: 20px; 
         }
+        .info-row { 
+            display: flex; 
+            align-items: center; 
+        }
+        .info-section label { 
+            width: 180px; 
+            font-weight: normal; 
+            white-space: nowrap; 
+            flex-shrink: 0; 
+        }
+        .info-section .separator { 
+            margin: 0 10px; 
+            width: 10px; 
+            text-align: center; 
+            flex-shrink: 0; 
+        }
+        .info-section select, .info-section input { 
+            flex-grow: 1; 
+            padding: 4px; 
+            border: 1px solid #ccc; 
+            font-family: Arial, sans-serif;
+        }
+        /* Akhir Perubahan pada info-section */
         .piutang-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 30px; }
         .piutang-table th, .piutang-table td { border: 1px solid #000; padding: 8px 10px; text-align: center; font-size: 13px; height: 25px; }
         .piutang-table th { background-color: #e0e0e0; font-weight: bold; }
@@ -25,7 +48,17 @@
         .data-nominal { text-align: right !important; }
         .area-section { margin-bottom: 25px; border: 1px solid #000; }
         .area-section h3 { font-size: 14px; padding: 8px 10px; margin: 0; background-color: #e0e0e0; border-bottom: 1px solid #000; }
-        .area-box { height: 80px; padding: 10px; resize: vertical; border: none; width: 100%; font-family: Arial, sans-serif; }
+        /* Perubahan pada area-box */
+        .area-box { 
+            height: 80px; 
+            padding: 10px; 
+            resize: vertical; 
+            border: none; /* Hapus border internal agar border luar section terlihat rapi */
+            width: 100%; 
+            box-sizing: border-box; /* Memastikan padding tidak menambah lebar melebihi 100% */
+            font-family: Arial, sans-serif; 
+        }
+        /* Akhir Perubahan pada area-box */
         .closing { margin-top: 40px; font-size: 14px; text-align: justify; }
     </style>
 </head>
@@ -42,13 +75,13 @@
         <p style="font-size: 14px;">Permohonan open block order, dengan ini kami lampirkan data toko:</p>
 
         <div class="info-section">
-            <div><label>No Pelanggan</label><span class="separator">:</span><input type="text" id="noPelanggan" readonly style="background-color: #f0f0f0;"></div>
-            <div><label>Nama Pelanggan</label><span class="separator">:</span>
+            <div class="info-row"><label>No Pelanggan</label><span class="separator">:</span><input type="text" id="noPelanggan" readonly style="background-color: #f0f0f0;"></div>
+            <div class="info-row"><label>Nama Pelanggan</label><span class="separator">:</span>
                 <input type="text" list="daftarPelanggan" id="namaPelangganInput" placeholder="Ketik atau pilih nama pelanggan..." autocomplete="off">
             </div>
-            <div><label>Rata-rata Pembayaran</label><span class="separator">:</span><input type="text" id="rataPembayaran"></div>
+            <div class="info-row"><label>Rata-rata Pembayaran</label><span class="separator">:</span><input type="text" id="rataPembayaran"></div>
 
-            <div><label>Cara Pembayaran</label><span class="separator">:</span>
+            <div class="info-row"><label>Cara Pembayaran</label><span class="separator">:</span>
                 <select id="caraPembayaran">
                     <option value="">-- Pilih Cara Pembayaran --</option>
                     <option value="CASH">CASH</option>
@@ -56,18 +89,18 @@
                     <option value="GIRO">GIRO</option>
                 </select>
             </div>
-            <div><label>Pengajuan</label><span class="separator">:</span>
+            <div class="info-row"><label>Pengajuan</label><span class="separator">:</span>
                 <select id="pengajuan">
                     <option value="">-- Pilih Jenis Pengajuan --</option>
                     <option value="OVERDUE">OVERDUE</option>
                     <option value="OVERLIMIT">OVERLIMIT</option>
                 </select>
             </div>
-            <div><label>Alasan Pengajuan</label><span class="separator">:</span><input type="text" id="alasanPengajuan"></div>
+            <div class="info-row"><label>Alasan Pengajuan</label><span class="separator">:</span><input type="text" id="alasanPengajuan"></div>
 
-            <div><label>Plafon Order</label><span class="separator">:</span><input type="text" id="plafonOrder"></div>
-            <div><label>Rencana Order</label><span class="separator">:</span><input type="text" id="rencanaOrder" placeholder="Masukkan angka tanpa titik atau koma"></div>
-            <div><label>Rencana Pembayaran</label><span class="separator">:</span><input type="text" id="rencanaPembayaran"></div>
+            <div class="info-row"><label>Plafon Order</label><span class="separator">:</span><input type="text" id="plafonOrder"></div>
+            <div class="info-row"><label>Rencana Order</label><span class="separator">:</span><input type="text" id="rencanaOrder" placeholder="Masukkan angka tanpa titik atau koma"></div>
+            <div class="info-row"><label>Rencana Pembayaran</label><span class="separator">:</span><input type="text" id="rencanaPembayaran"></div>
         </div>
 
         <h3 style="margin-top: 25px; font-size: 14px;">Data Piutang toko:</h3>
@@ -113,7 +146,6 @@
         </div>
     </div>
 
-    <!-- Datalist diletakkan di luar agar tetap terhubung dengan input di dalam grid -->
     <datalist id="daftarPelanggan"></datalist>
 
     <script>
