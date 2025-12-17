@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FORM OPEN BLOCK - PT. NUSA SARANA INDONESIA</title>
+    <title>Form Open Block</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'DM Sans', sans-serif; margin: 0; padding: 30px; background-color: #f4f4f4; }
@@ -255,10 +255,21 @@
                 const imgData = canvas.toDataURL('image/jpeg', 1.0);
                 
                 const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight(); // 297 mm untuk A4
                 const imgWidth = pdfWidth;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                // Hitung rasio scaling agar muat dalam 1 halaman (dengan sedikit margin atas/bawah)
+                const scaleRatio = pdfHeight / imgHeight;
+                const finalHeight = pdfHeight * scaleRatio * 0.98; // 98% untuk sedikit margin
+                const finalWidth = imgWidth * scaleRatio * 0.98;
+
+                // Posisi tengah vertikal dan horizontal
+                const x = (pdfWidth - finalWidth) / 2;
+                const y = (pdfHeight - finalHeight) / 2;
+
+                pdf.addImage(imgData, 'JPEG', x, y, finalWidth, finalHeight);
                 
-                pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
                 pdf.save(`Pengajuan Open Block - ${prep.originalValues.nama} - ${getFormattedDate()}.pdf`);
                 alert('File PDF tersimpan.');
             });
@@ -302,7 +313,7 @@
                 rataPembayaranInput.value = (rataVal && rataVal !== '-') ? formatRupiah(rataVal) : '-';
                 updatePiutangTable(val);
             } else {
-                noPelangganInput.value = '';
+                        noPelangganInput.value = '';
                 rataPembayaranInput.value = '';
                 updatePiutangTable('');
             }
@@ -323,7 +334,7 @@
                 if (age in cat) cat[age] += item.nominal;
             });
             document.getElementById('nominal-1-30').textContent = formatRupiah(cat['1-30']);
-            document.getElementById('nominal-30-60').textContent = formatRupiah(cat['30-60']);
+            document.getElementById('nominal20-60').textContent = formatRupiah(cat['30-60']);
             document.getElementById('nominal-61-90').textContent = formatRupiah(cat['61-90']);
             document.getElementById('nominal-over-120').textContent = formatRupiah(cat['>120']);
             document.getElementById('totalNominal').textContent = formatRupiah(total);
