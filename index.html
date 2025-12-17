@@ -6,80 +6,39 @@
     <title>FORM OPEN BLOCK - PT. NUSA SARANA INDONESIA</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Mengubah semua font menjadi DM Sans */
         body { font-family: 'DM Sans', sans-serif; margin: 0; padding: 30px; background-color: #f4f4f4; }
         .container { width: 800px; margin: 0 auto; background-color: white; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
         .logo { font-size: 20px; font-weight: bold; color: #004d99; display: flex; align-items: center; }
         .doc-info { text-align: right; font-size: 14px; font-weight: bold; }
         h1 { text-align: center; font-size: 18px; margin-top: 5px; margin-bottom: 30px; }
-        .info-section { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            margin-bottom: 20px; 
-        }
-        .info-row { 
-            display: flex; 
-            align-items: center; 
-        }
-        .info-section label { 
-            width: 180px; 
-            font-weight: normal; 
-            white-space: nowrap; 
-            flex-shrink: 0; 
-        }
-        .info-section .separator { 
-            margin: 0 10px; 
-            width: 10px; 
-            text-align: center; 
-            flex-shrink: 0; 
-        }
+        
+        /* Layout Info Section */
+        .info-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .info-row { display: flex; align-items: center; }
+        .info-section label { width: 180px; font-weight: normal; white-space: nowrap; flex-shrink: 0; }
+        .info-section .separator { margin: 0 10px; width: 10px; text-align: center; flex-shrink: 0; }
         .info-section select, .info-section input { 
-            flex-grow: 1; 
-            padding: 4px; 
-            border: 1px solid #ccc; 
-            font-family: 'DM Sans', sans-serif;
-            transition: border-color 0.3s;
+            flex-grow: 1; padding: 4px; border: 1px solid #ccc; font-family: 'DM Sans', sans-serif; transition: border-color 0.3s;
         }
+
+        /* Tabel Piutang */
         .piutang-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 30px; }
         .piutang-table th, .piutang-table td { border: 1px solid #000; padding: 8px 10px; text-align: center; font-size: 13px; height: 25px; }
         .piutang-table th { background-color: #e0e0e0; font-weight: bold; }
         .piutang-table .total-row td { font-weight: bold; text-align: center; background-color: #e0e0e0; padding: 8px 10px; }
         .data-nominal { text-align: right !important; }
+
+        /* Textarea Sections */
         .area-section { margin-bottom: 25px; border: 1px solid #000; }
         .area-section h3 { font-size: 14px; padding: 8px 10px; margin: 0; background-color: #e0e0e0; border-bottom: 1px solid #000; }
-        .area-box { 
-            height: 80px; 
-            padding: 10px; 
-            resize: vertical; 
-            border: none; 
-            width: 100%; 
-            box-sizing: border-box; 
-            font-family: 'DM Sans', sans-serif;
-        }
-        .closing { margin-top: 40px; font-size: 14px; text-align: justify; }
+        .area-box { height: 80px; padding: 10px; resize: vertical; border: none; width: 100%; box-sizing: border-box; font-family: 'DM Sans', sans-serif; }
         
-        .footer-actions {
-            margin-top: 20px;
-            text-align: left;
-        }
-        .print-button {
-            padding: 10px 15px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .print-button:hover {
-            background-color: #1e7e34;
-        }
-
-        .error-border {
-            border: 2px solid red !important;
-        }
+        .closing { margin-top: 40px; font-size: 14px; text-align: justify; }
+        .footer-actions { margin-top: 20px; text-align: left; }
+        .save-button { padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        .save-button:hover { background-color: #1e7e34; }
+        .error-border { border: 2px solid red !important; }
     </style>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
@@ -100,7 +59,7 @@
             <div class="info-row"><label>Nama Pelanggan</label><span class="separator">:</span>
                 <input type="text" list="daftarPelanggan" id="namaPelangganInput" placeholder="Ketik atau pilih nama pelanggan..." autocomplete="off">
             </div>
-            <div class="info-row"><label>Rata-rata Pembayaran</label><span class="separator">:</span><input type="text" id="rataPembayaran"></div>
+            <div class="info-row"><label>Rata-rata Pembayaran</label><span class="separator">:</span><input type="text" id="rataPembayaran" readonly style="background-color: #f0f0f0;"></div>
 
             <div class="info-row"><label>Cara Pembayaran</label><span class="separator">:</span>
                 <select id="caraPembayaran">
@@ -163,17 +122,13 @@
         </div>
         
         <div class="closing">
-            <p style="margin-bottom: 10px;">
-                Demikian permohonan ini kami ajukan, mohon persetujuannya. Terima kasih.
-            </p>
-            <p style="font-size: 14px; margin-top: 10px;">
-                <em id="tanggalPengajuan">Pengajuan ini dibuat dan dari data per tanggal ...</em>
-            </p>
+            <p style="margin-bottom: 20px;">Demikian permohonan ini kami ajukan, mohon persetujuannya. Terima kasih.</p>
+            <p style="font-size: 14px;"><em id="tanggalPengajuan">Pengajuan ini dibuat dan dari data per tanggal ...</em></p>
         </div>
     </div>
 
     <div class="footer-actions">
-        <button class="print-button" onclick="saveAsJpg()">Simpan JPG</button>
+        <button class="save-button" onclick="saveAsJpg()">Simpan JPG</button>
     </div>
 
     <datalist id="daftarPelanggan"></datalist>
@@ -182,15 +137,14 @@
         const pelangganCSV = 'data.csv';
         const inputPelanggan = document.getElementById('namaPelangganInput');
         const noPelangganInput = document.getElementById('noPelanggan');
+        const rataPembayaranInput = document.getElementById('rataPembayaran');
         const datalist = document.getElementById('daftarPelanggan');
         const rencanaOrderInput = document.getElementById('rencanaOrder');
-        const rencanaPembayaranInput = document.getElementById('rencanaPembayaran');
-        const caraPembayaranSelect = document.getElementById('caraPembayaran');
-        const pengajuanSelect = document.getElementById('pengajuan');
         const tanggalPengajuanElement = document.getElementById('tanggalPengajuan');
+        
         let allPiutangData = [];
         let allPelangganNames = [];
-        let nameToNoPelanggan = {};
+        let nameToInfo = {}; // Objek untuk menyimpan No Pelanggan & Rata-rata Pembayaran
 
         function formatRupiah(number) {
             let num = parseFloat(number);
@@ -198,266 +152,143 @@
             return Math.round(num).toLocaleString('id-ID');
         }
 
-        function formatRencanaOrder() {
-            let value = rencanaOrderInput.value.replace(/\D/g, '');
-            if (value === '') {
-                rencanaOrderInput.value = '';
-                return;
-            }
-            let formatted = parseInt(value).toLocaleString('id-ID');
-            rencanaOrderInput.value = formatted;
-        }
-
-        rencanaOrderInput.addEventListener('input', formatRencanaOrder);
-        rencanaOrderInput.addEventListener('blur', () => {
-            if (rencanaOrderInput.value !== '') {
-                if (!rencanaOrderInput.value.startsWith('Rp ')) {
-                    rencanaOrderInput.value = 'Rp ' + rencanaOrderInput.value;
-                }
-            }
+        // Logic Rencana Order Rupiah
+        rencanaOrderInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            this.value = value ? parseInt(value).toLocaleString('id-ID') : '';
         });
-        rencanaOrderInput.addEventListener('focus', () => {
-            if (rencanaOrderInput.value.startsWith('Rp ')) {
-                rencanaOrderInput.value = rencanaOrderInput.value.replace('Rp ', '').replace(/\./g, '');
-            }
-            formatRencanaOrder();
+        rencanaOrderInput.addEventListener('blur', function() {
+            if (this.value && !this.value.startsWith('Rp ')) this.value = 'Rp ' + this.value;
+        });
+        rencanaOrderInput.addEventListener('focus', function() {
+            this.value = this.value.replace('Rp ', '').replace(/\./g, '');
         });
 
-        // --- VALIDASI DAN FUNGSI SIMPAN JPG BARU ---
-        
-        function clearErrorBorders() {
-            [inputPelanggan, rencanaOrderInput, rencanaPembayaranInput, caraPembayaranSelect, pengajuanSelect].forEach(el => {
-                el.classList.remove('error-border');
-            });
-        }
-
-        function saveAsJpg() {
-            clearErrorBorders(); 
-            const container = document.getElementById('formContainer');
-            let incomplete = false;
-
-            // 1. Tentukan field yang wajib diisi
-            const requiredFields = [
-                { element: inputPelanggan, name: 'Nama Pelanggan' },
-                { element: rencanaOrderInput, name: 'Rencana Order' },
-                { element: rencanaPembayaranInput, name: 'Rencana Pembayaran' },
-                { element: caraPembayaranSelect, name: 'Cara Pembayaran' },
-                { element: pengajuanSelect, name: 'Pengajuan' }
-            ];
-
-            // 2. Lakukan validasi
-            requiredFields.forEach(field => {
-                const value = field.element.value.trim();
-                // Khusus untuk rencanaOrderInput, cek nilai setelah format ribuan dihapus saat fokus
-                if (field.element === rencanaOrderInput) {
-                     // Check if it's empty or only contains 'Rp '
-                     if (value === '' || value === 'Rp') {
-                        field.element.classList.add('error-border');
-                        incomplete = true;
-                    }
-                } else if (value === '' || value === '-- Pilih Cara Pembayaran --' || value === '-- Pilih Jenis Pengajuan --') {
-                    field.element.classList.add('error-border');
-                    incomplete = true;
-                }
-            });
-
-            // 3. Hentikan jika data belum lengkap
-            if (incomplete) {
-                alert('Data Belum Lengkap! Mohon lengkapi kolom yang bergaris merah.');
-                return; 
-            }
-
-            // 4. Proses Simpan JPG (html2canvas)
-            
-            // Simpan nilai asli dan ganti dengan span untuk screenshot yang bersih
-            const originalNoPelanggan = noPelangganInput.value;
-            const originalInputNames = inputPelanggan.value;
-            const originalRencanaOrder = rencanaOrderInput.value;
-            const originalRencanaPembayaran = rencanaPembayaranInput.value;
-            const originalCaraPembayaran = caraPembayaranSelect.value;
-            const originalPengajuan = pengajuanSelect.value;
-
-            const fieldsToReplace = [
-                { input: noPelangganInput, value: originalNoPelanggan },
-                { input: inputPelanggan, value: originalInputNames },
-                { input: rencanaOrderInput, value: originalRencanaOrder },
-                { input: rencanaPembayaranInput, value: originalRencanaPembayaran }
-            ];
-            const selectToReplace = [
-                { select: caraPembayaranSelect, value: originalCaraPembayaran },
-                { select: pengajuanSelect, value: originalPengajuan }
-            ];
-            
-            let replacedElements = [];
-            
-            // Ganti input dan select dengan span polos (menghilangkan garis)
-            [...fieldsToReplace, ...selectToReplace.map(item => ({input: item.select, value: item.value}))].forEach(item => {
-                const span = document.createElement('span');
-                span.textContent = item.value;
-                span.style.padding = '4px 0'; /* Padding vertikal yang sama dengan input */
-                span.style.display = 'inline-block';
-                span.style.minWidth = '100px';
-
-                const parent = item.input.parentNode;
-                parent.replaceChild(span, item.input);
-                replacedElements.push({ original: item.input, replacement: span, parent: parent });
-            });
-
-            // Sembunyikan tombol
-            const footerActions = document.querySelector('.footer-actions');
-            footerActions.style.display = 'none';
-
-            // html2canvas untuk mengambil screenshot
-            html2canvas(container, {
-                scale: 2, 
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff'
-            }).then(canvas => {
-                // Kembalikan elemen input/select
-                replacedElements.forEach(item => {
-                    item.parent.replaceChild(item.original, item.replacement);
-                });
-
-                // Kembalikan tombol
-                footerActions.style.display = 'block';
-
-                // Simpan gambar
-                const image = canvas.toDataURL('image/jpeg', 0.9); 
-                const link = document.createElement('a');
-                link.href = image;
-                
-                let filename = `FORM_OPEN_BLOCK_${nameToNoPelanggan[originalInputNames] || 'TANPA_NO'}_${new Date().toLocaleDateString('id-ID').replace(/\//g, '-')}.jpg`;
-                link.download = filename;
-                link.click();
-                
-                // Tampilkan Pop-up Konfirmasi
-                alert('File tersimpan ke galeri Anda.');
-
-            }).catch(error => {
-                console.error("Error generating image:", error);
-                alert('Gagal membuat file JPG. Silakan coba lagi.');
-                
-                // Pastikan elemen kembali ke normal jika terjadi error
-                replacedElements.forEach(item => {
-                    if (item.replacement.parentNode) item.parent.replaceChild(item.original, item.replacement);
-                });
-                footerActions.style.display = 'block';
-            });
-        }
-        
-        // --- DATA LOADING DAN FUNGSI LAINNYA ---
-        
         async function loadPiutangData() {
             try {
                 const response = await fetch(pelangganCSV);
-                if (!response.ok) throw new Error(`Gagal memuat file: ${response.statusText}`);
                 const csvText = await response.text();
-
-                const rows = csvText.trim().split('\n');
-                const dataRows = rows.slice(1);
+                const rows = csvText.trim().split('\n').slice(1);
 
                 const uniqueNames = new Set();
-
-                dataRows.forEach(row => {
+                rows.forEach(row => {
                     const columns = row.split(';');
-                    if (columns.length < 4) return;
+                    if (columns.length < 5) return;
 
                     let nama = columns[0].trim().replace(/"/g, '');
                     let umur = columns[1].trim();
+                    let nominal = parseFloat(columns[2].trim().replace(/,/g, '.'));
                     let noPel = columns[3].trim().replace(/"/g, '');
-                    const nominalStr = columns[2].trim().replace(/,/g, '.');
-                    const nominal = parseFloat(nominalStr);
+                    let rataBayar = columns[4].trim().replace(/"/g, '');
 
                     if (nama && !isNaN(nominal)) {
-                        if (umur.startsWith('>')) umur = '>' + umur.slice(1).trim();
                         allPiutangData.push({ nama, umur, nominal });
-
                         uniqueNames.add(nama);
-
-                        if (!nameToNoPelanggan[nama] && noPel) {
-                            nameToNoPelanggan[nama] = noPel;
+                        if (!nameToInfo[nama]) {
+                            nameToInfo[nama] = { noPel, rataBayar };
                         }
                     }
                 });
 
                 allPelangganNames = [...uniqueNames].sort();
-
-                datalist.innerHTML = '';
                 allPelangganNames.forEach(nama => {
                     const option = document.createElement('option');
                     option.value = nama;
                     datalist.appendChild(option);
                 });
-
-            } catch (error) {
-                console.error("Error:", error);
-            }
+            } catch (error) { console.error("Error loading CSV:", error); }
         }
 
         function handleInput() {
-            const value = inputPelanggan.value.trim();
-
-            if (value && nameToNoPelanggan[value]) {
-                noPelangganInput.value = nameToNoPelanggan[value];
+            const val = inputPelanggan.value.trim();
+            if (nameToInfo[val]) {
+                noPelangganInput.value = nameToInfo[val].noPel;
+                rataPembayaranInput.value = nameToInfo[val].rataBayar;
+                updatePiutangTable(val);
             } else {
                 noPelangganInput.value = '';
-            }
-
-            if (allPelangganNames.includes(value)) {
-                updatePiutangTable(value);
-            } else {
+                rataPembayaranInput.value = '';
                 updatePiutangTable('');
             }
         }
 
         function updatePiutangTable(namaPelanggan) {
+            const categories = ['1-30', '30-60', '61-90', '>120'];
+            categories.forEach(cat => document.getElementById(`nominal-${cat === '>120' ? 'over-120' : cat}`).textContent = '');
             document.getElementById('totalNominal').textContent = '-';
-            document.getElementById('nominal-1-30').textContent = '';
-            document.getElementById('nominal-30-60').textContent = '';
-            document.getElementById('nominal-61-90').textContent = '';
-            document.getElementById('nominal-over-120').textContent = '';
 
             if (!namaPelanggan) return;
 
-            const filteredData = allPiutangData.filter(item => item.nama === namaPelanggan);
+            const filtered = allPiutangData.filter(item => item.nama === namaPelanggan);
+            let totals = { '1-30': 0, '30-60': 0, '61-90': 0, '>120': 0 };
+            let grandTotal = 0;
 
-            const piutangByCategory = {
-                '1-30': 0,
-                '30-60': 0,
-                '61-90': 0,
-                '>120': 0
-            };
-
-            let totalPiutang = 0;
-
-            filteredData.forEach(item => {
-                totalPiutang += item.nominal;
-                if (item.umur in piutangByCategory) {
-                    piutangByCategory[item.umur] += item.nominal;
+            filtered.forEach(item => {
+                if (totals.hasOwnProperty(item.umur)) {
+                    totals[item.umur] += item.nominal;
+                    grandTotal += item.nominal;
                 }
             });
 
-            document.getElementById('nominal-1-30').textContent = formatRupiah(piutangByCategory['1-30']);
-            document.getElementById('nominal-30-60').textContent = formatRupiah(piutangByCategory['30-60']);
-            document.getElementById('nominal-61-90').textContent = formatRupiah(piutangByCategory['61-90']);
-            document.getElementById('nominal-over-120').textContent = formatRupiah(piutangByCategory['>120']);
-            document.getElementById('totalNominal').textContent = formatRupiah(totalPiutang);
+            categories.forEach(cat => {
+                document.getElementById(`nominal-${cat === '>120' ? 'over-120' : cat}`).textContent = formatRupiah(totals[cat]);
+            });
+            document.getElementById('totalNominal').textContent = formatRupiah(grandTotal);
         }
 
-        function setTodayDate() {
-            const today = new Date();
+        function saveAsJpg() {
+            const required = ['namaPelangganInput', 'rencanaOrder', 'rencanaPembayaran', 'caraPembayaran', 'pengajuan'];
+            let valid = true;
+            required.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el.value || el.value.includes('-- Pilih')) {
+                    el.classList.add('error-border');
+                    valid = false;
+                } else {
+                    el.classList.remove('error-border');
+                }
+            });
+
+            if (!valid) {
+                alert('Data Belum Lengkap!');
+                return;
+            }
+
+            const container = document.getElementById('formContainer');
+            const footer = document.querySelector('.footer-actions');
+            footer.style.display = 'none';
+
+            // Swap inputs for clean JPG
+            const inputs = container.querySelectorAll('input, select, textarea');
+            const backups = [];
+            inputs.forEach(el => {
+                const span = document.createElement('span');
+                span.textContent = el.value;
+                span.style.padding = '4px 0';
+                span.style.display = 'inline-block';
+                el.parentElement.replaceChild(span, el);
+                backups.push({el, span});
+            });
+
+            html2canvas(container, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                backups.forEach(b => b.span.parentElement.replaceChild(b.el, b.span));
+                footer.style.display = 'block';
+                const link = document.createElement('a');
+                link.download = `FORM_OPEN_BLOCK_${noPelangganInput.value || 'DATA'}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                alert('File tersimpan ke galeri Anda.');
+            });
+        }
+
+        function setDate() {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            const formattedDate = today.toLocaleDateString('id-ID', options);
-            tanggalPengajuanElement.innerHTML = `<em>Pengajuan ini dibuat dan dari data per tanggal ${formattedDate}</em>`;
+            tanggalPengajuanElement.innerHTML = `<em>Pengajuan ini dibuat dan dari data per tanggal ${new Date().toLocaleDateString('id-ID', options)}</em>`;
         }
 
         inputPelanggan.addEventListener('input', handleInput);
-        inputPelanggan.addEventListener('change', handleInput);
-
         loadPiutangData();
-        setTodayDate();
+        setDate();
     </script>
-
 </body>
 </html>
