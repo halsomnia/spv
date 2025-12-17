@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FORM OPEN BLOCK - PT. NUSA SARANA INDONESIA</title>
+    <style>
+        /* Gaya tetap sama seperti asli Anda */
+        body { font-family: Arial, sans-serif; margin: 0; padding: 30px; background-color: #f4f4f4; }
+        .container { width: 800px; margin: 0 auto; background-color: white; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+        .logo { font-size: 20px; font-weight: bold; color: #004d99; display: flex; align-items: center; }
+        .doc-info { text-align: right; font-size: 14px; font-weight: bold; }
+        h1 { text-align: center; font-size: 18px; margin-top: 5px; margin-bottom: 30px; }
+        .info-section div { margin: 4px 0; display: flex; align-items: center; }
+        .info-section label { width: 150px; font-weight: normal; }
+        .info-section .separator { margin-right: 10px; width: 10px; text-align: center; }
+        .info-section select, .info-section input { flex-grow: 1; padding: 4px; border: 1px solid #ccc; }
+        .piutang-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 30px; }
+        .piutang-table th, .piutang-table td { border: 1px solid #000; padding: 8px 10px; text-align: center; font-size: 13px; height: 25px; }
+        .piutang-table th { background-color: #e0e0e0; font-weight: bold; }
+        .piutang-table .total-row td { font-weight: bold; text-align: center; background-color: #e0e0e0; padding: 8px 10px; }
+        .data-nominal { text-align: right !important; }
+        .area-section { margin-bottom: 25px; border: 1px solid #000; }
+        .area-section h3 { font-size: 14px; padding: 8px 10px; margin: 0; background-color: #e0e0e0; border-bottom: 1px solid #000; }
+        .area-box { height: 60px; padding: 5px; }
+        .closing { margin-top: 40px; font-size: 14px; text-align: justify; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">PT. NUSA SARANA INDONESIA</div>
+            <div class="doc-info">NSI-F-MKT-002</div>
+        </div>
+        
+        <h1>FORM OPEN BLOCK</h1>
+
+        <p style="font-size: 14px;">Permohonan open block order, dengan ini kami lampirkan data toko:</p>
+
+        <div class="info-section">
+            <div><label>No Pelanggan</label><span class="separator">:</span><input type="text" id="noPelanggan"></div>
+            <div><label>Nama Pelanggan</label><span class="separator">:</span>
+                <select id="namaPelangganSelect">
+                    <option value="">-- Pilih Pelanggan --</option>
+                </select>
+            </div>
+            <div><label>Rata-rata Pembayaran</label><span class="separator">:</span><input type="text" id="rataPembayaran"></div>
+            <div><label>Cara Pembayaran</label><span class="separator">:</span><input type="text" id="caraPembayaran"></div>
+            <div><label>Pengajuan</label><span class="separator">:</span><input type="text" id="pengajuan"></div>
+            <div><label>Alasan Pengajuan</label><span class="separator">:</span><input type="text" id="alasanPengajuan"></div>
+            <div><label>Plafon Order</label><span class="separator">:</span><input type="text" id="plafonOrder"></div>
+            <div><label>Rencana Order</label><span class="separator">:</span><input type="text" id="rencanaOrder"></div>
+            <div><label>Rencana Pembayaran</label><span class="separator">:</span><input type="text" id="rencanaPembayaran"></div>
+        </div>
+
+        <h3 style="margin-top: 25px; font-size: 14px;">Data Piutang toko:</h3>
+        <table class="piutang-table">
+            <thead>
+                <tr>
+                    <th style="width: 10%;">No Faktur</th>
+                    <th style="width: 10%;">Tgl Faktur</th>
+                    <th style="width: 15%;">Umur Piutang</th>
+                    <th style="width: 20%;">Nominal</th>
+                    <th style="width: 15%;">Outstanding</th>
+                    <th style="width: 15%;">TOP</th>
+                    <th style="width: 15%;">Jatuh Tempo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td></td><td></td><td>1-30</td><td id="nominal-1-30" class="data-nominal"></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td>30-60</td><td id="nominal-30-60" class="data-nominal"></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td>61-90</td><td id="nominal-61-90" class="data-nominal"></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td>>120</td><td id="nominal-over-120" class="data-nominal"></td><td></td><td></td><td></td></tr>
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="3" style="text-align: right; padding-right: 15px;">Total</td>
+                    <td id="totalNominal" class="data-nominal">-</td>
+                    <td colspan="3"></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="area-section">
+            <h3>Rekomendasi dari Tim Piutang</h3>
+            <div class="area-box"></div>
+        </div>
+
+        <div class="area-section">
+            <h3>Persetujuan dari Area Sales Manager (ASM)</h3>
+            <div class="area-box"></div>
+        </div>
+        
+        <div class="closing">
+            Demikian permohonan ini kami ajukan, mohon persetujuannya. Terima kasih.
+        </div>
+    </div>
+
+    <script>
+        const pelangganCSV = 'data.csv'; // Pastikan file data.csv berada di folder yang sama
+        const selectElement = document.getElementById('namaPelangganSelect');
+        let allPiutangData = [];
+
+        function formatRupiah(number) {
+            let num = parseFloat(number);
+            if (isNaN(num)) return '-';
+            return num.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        async function loadPiutangData() {
+            try {
+                const response = await fetch(pelangganCSV);
+                if (!response.ok) throw new Error(`Gagal memuat file: ${response.statusText}`);
+                const csvText = await response.text();
+
+                const rows = csvText.trim().split('\n');
+                // Lewati header (baris pertama)
+                const dataRows = rows.slice(1);
+
+                const uniqueNames = new Set();
+
+                dataRows.forEach(row => {
+                    const columns = row.split(';');
+                    if (columns.length < 3) return;
+
+                    const nama = columns[0].trim().replace(/"/g, '');
+                    let umur = columns[1].trim(); // Bersihkan spasi
+                    const nominalStr = columns[2].trim().replace(/,/g, '.');
+                    const nominal = parseFloat(nominalStr);
+
+                    if (nama && !isNaN(nominal)) {
+                        // Normalisasi kategori umur (hilangkan spasi sebelum >)
+                        if (umur.startsWith('>')) umur = '>' + umur.slice(1).trim();
+                        allPiutangData.push({ nama, umur, nominal });
+                        uniqueNames.add(nama);
+                    }
+                });
+
+                // Isi dropdown
+                if (uniqueNames.size > 0) {
+                    [...uniqueNames].sort().forEach(nama => {
+                        const option = document.createElement('option');
+                        option.value = nama;
+                        option.textContent = nama;
+                        selectElement.appendChild(option);
+                    });
+                } else {
+                    selectElement.innerHTML += '<option disabled>Data Pelanggan Kosong</option>';
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                selectElement.innerHTML += '<option disabled>ERROR: Gagal memuat data.csv</option>';
+            }
+        }
+
+        function updatePiutangTable(namaPelanggan) {
+            // Reset
+            document.getElementById('totalNominal').textContent = '-';
+            document.getElementById('nominal-1-30').textContent = '';
+            document.getElementById('nominal-30-60').textContent = '';
+            document.getElementById('nominal-61-90').textContent = '';
+            document.getElementById('nominal-over-120').textContent = '';
+
+            if (!namaPelanggan) return;
+
+            const filteredData = allPiutangData.filter(item => item.nama === namaPelanggan);
+
+            const piutangByCategory = {
+                '1-30': 0,
+                '30-60': 0,
+                '61-90': 0,
+                '>120': 0
+            };
+
+            let totalPiutang = 0;
+
+            filteredData.forEach(item => {
+                totalPiutang += item.nominal;
+                if (item.umur in piutangByCategory) {
+                    piutangByCategory[item.umur] += item.nominal;
+                }
+            });
+
+            document.getElementById('nominal-1-30').textContent = formatRupiah(piutangByCategory['1-30']);
+            document.getElementById('nominal-30-60').textContent = formatRupiah(piutangByCategory['30-60']);
+            document.getElementById('nominal-61-90').textContent = formatRupiah(piutangByCategory['61-90']);
+            document.getElementById('nominal-over-120').textContent = formatRupiah(piutangByCategory['>120']);
+            document.getElementById('totalNominal').textContent = formatRupiah(totalPiutang);
+        }
+
+        selectElement.addEventListener('change', (e) => {
+            updatePiutangTable(e.target.value);
+        });
+
+        // Muat data saat halaman dibuka
+        loadPiutangData();
+    </script>
+
+</body>
+</html>
