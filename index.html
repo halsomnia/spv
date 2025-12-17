@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FORM OPEN BLOCK - PT. NUSA SARANA INDONESIA</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 30px; background-color: #f4f4f4; }
+        /* Mengubah semua font menjadi DM Sans */
+        body { font-family: 'DM Sans', sans-serif; margin: 0; padding: 30px; background-color: #f4f4f4; }
         .container { width: 800px; margin: 0 auto; background-color: white; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
         .logo { font-size: 20px; font-weight: bold; color: #004d99; display: flex; align-items: center; }
         .doc-info { text-align: right; font-size: 14px; font-weight: bold; }
         h1 { text-align: center; font-size: 18px; margin-top: 5px; margin-bottom: 30px; }
-        /* Perubahan pada info-section */
         .info-section { 
             display: flex; 
             flex-direction: column; 
@@ -38,9 +39,9 @@
             flex-grow: 1; 
             padding: 4px; 
             border: 1px solid #ccc; 
-            font-family: Arial, sans-serif;
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.3s;
         }
-        /* Akhir Perubahan pada info-section */
         .piutang-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 30px; }
         .piutang-table th, .piutang-table td { border: 1px solid #000; padding: 8px 10px; text-align: center; font-size: 13px; height: 25px; }
         .piutang-table th { background-color: #e0e0e0; font-weight: bold; }
@@ -48,23 +49,43 @@
         .data-nominal { text-align: right !important; }
         .area-section { margin-bottom: 25px; border: 1px solid #000; }
         .area-section h3 { font-size: 14px; padding: 8px 10px; margin: 0; background-color: #e0e0e0; border-bottom: 1px solid #000; }
-        /* Perubahan pada area-box */
         .area-box { 
             height: 80px; 
             padding: 10px; 
             resize: vertical; 
-            border: none; /* Hapus border internal agar border luar section terlihat rapi */
+            border: none; 
             width: 100%; 
-            box-sizing: border-box; /* Memastikan padding tidak menambah lebar melebihi 100% */
-            font-family: Arial, sans-serif; 
+            box-sizing: border-box; 
+            font-family: 'DM Sans', sans-serif;
         }
-        /* Akhir Perubahan pada area-box */
         .closing { margin-top: 40px; font-size: 14px; text-align: justify; }
+        
+        .footer-actions {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .print-button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .print-button:hover {
+            background-color: #1e7e34;
+        }
+
+        .error-border {
+            border: 2px solid red !important;
+        }
     </style>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
 
-    <div class="container">
+    <div class="container" id="formContainer">
         <div class="header">
             <div class="logo">PT. NUSA SARANA INDONESIA</div>
             <div class="doc-info">NSI-F-MKT-002</div>
@@ -142,8 +163,17 @@
         </div>
         
         <div class="closing">
-            Demikian permohonan ini kami ajukan, mohon persetujuannya. Terima kasih.
+            <p style="margin-bottom: 10px;">
+                Demikian permohonan ini kami ajukan, mohon persetujuannya. Terima kasih.
+            </p>
+            <p style="font-size: 14px; margin-top: 10px;">
+                <em id="tanggalPengajuan">Pengajuan ini dibuat dan dari data per tanggal ...</em>
+            </p>
         </div>
+    </div>
+
+    <div class="footer-actions">
+        <button class="print-button" onclick="saveAsJpg()">Simpan JPG</button>
     </div>
 
     <datalist id="daftarPelanggan"></datalist>
@@ -154,6 +184,10 @@
         const noPelangganInput = document.getElementById('noPelanggan');
         const datalist = document.getElementById('daftarPelanggan');
         const rencanaOrderInput = document.getElementById('rencanaOrder');
+        const rencanaPembayaranInput = document.getElementById('rencanaPembayaran');
+        const caraPembayaranSelect = document.getElementById('caraPembayaran');
+        const pengajuanSelect = document.getElementById('pengajuan');
+        const tanggalPengajuanElement = document.getElementById('tanggalPengajuan');
         let allPiutangData = [];
         let allPelangganNames = [];
         let nameToNoPelanggan = {};
@@ -177,16 +211,143 @@
         rencanaOrderInput.addEventListener('input', formatRencanaOrder);
         rencanaOrderInput.addEventListener('blur', () => {
             if (rencanaOrderInput.value !== '') {
-                rencanaOrderInput.value = 'Rp ' + rencanaOrderInput.value;
+                if (!rencanaOrderInput.value.startsWith('Rp ')) {
+                    rencanaOrderInput.value = 'Rp ' + rencanaOrderInput.value;
+                }
             }
         });
         rencanaOrderInput.addEventListener('focus', () => {
             if (rencanaOrderInput.value.startsWith('Rp ')) {
                 rencanaOrderInput.value = rencanaOrderInput.value.replace('Rp ', '').replace(/\./g, '');
-                formatRencanaOrder();
             }
+            formatRencanaOrder();
         });
 
+        // --- VALIDASI DAN FUNGSI SIMPAN JPG BARU ---
+        
+        function clearErrorBorders() {
+            [inputPelanggan, rencanaOrderInput, rencanaPembayaranInput, caraPembayaranSelect, pengajuanSelect].forEach(el => {
+                el.classList.remove('error-border');
+            });
+        }
+
+        function saveAsJpg() {
+            clearErrorBorders(); 
+            const container = document.getElementById('formContainer');
+            let incomplete = false;
+
+            // 1. Tentukan field yang wajib diisi
+            const requiredFields = [
+                { element: inputPelanggan, name: 'Nama Pelanggan' },
+                { element: rencanaOrderInput, name: 'Rencana Order' },
+                { element: rencanaPembayaranInput, name: 'Rencana Pembayaran' },
+                { element: caraPembayaranSelect, name: 'Cara Pembayaran' },
+                { element: pengajuanSelect, name: 'Pengajuan' }
+            ];
+
+            // 2. Lakukan validasi
+            requiredFields.forEach(field => {
+                const value = field.element.value.trim();
+                // Khusus untuk rencanaOrderInput, cek nilai setelah format ribuan dihapus saat fokus
+                if (field.element === rencanaOrderInput) {
+                     // Check if it's empty or only contains 'Rp '
+                     if (value === '' || value === 'Rp') {
+                        field.element.classList.add('error-border');
+                        incomplete = true;
+                    }
+                } else if (value === '' || value === '-- Pilih Cara Pembayaran --' || value === '-- Pilih Jenis Pengajuan --') {
+                    field.element.classList.add('error-border');
+                    incomplete = true;
+                }
+            });
+
+            // 3. Hentikan jika data belum lengkap
+            if (incomplete) {
+                alert('Data Belum Lengkap! Mohon lengkapi kolom yang bergaris merah.');
+                return; 
+            }
+
+            // 4. Proses Simpan JPG (html2canvas)
+            
+            // Simpan nilai asli dan ganti dengan span untuk screenshot yang bersih
+            const originalNoPelanggan = noPelangganInput.value;
+            const originalInputNames = inputPelanggan.value;
+            const originalRencanaOrder = rencanaOrderInput.value;
+            const originalRencanaPembayaran = rencanaPembayaranInput.value;
+            const originalCaraPembayaran = caraPembayaranSelect.value;
+            const originalPengajuan = pengajuanSelect.value;
+
+            const fieldsToReplace = [
+                { input: noPelangganInput, value: originalNoPelanggan },
+                { input: inputPelanggan, value: originalInputNames },
+                { input: rencanaOrderInput, value: originalRencanaOrder },
+                { input: rencanaPembayaranInput, value: originalRencanaPembayaran }
+            ];
+            const selectToReplace = [
+                { select: caraPembayaranSelect, value: originalCaraPembayaran },
+                { select: pengajuanSelect, value: originalPengajuan }
+            ];
+            
+            let replacedElements = [];
+            
+            // Ganti input dan select dengan span polos (menghilangkan garis)
+            [...fieldsToReplace, ...selectToReplace.map(item => ({input: item.select, value: item.value}))].forEach(item => {
+                const span = document.createElement('span');
+                span.textContent = item.value;
+                span.style.padding = '4px 0'; /* Padding vertikal yang sama dengan input */
+                span.style.display = 'inline-block';
+                span.style.minWidth = '100px';
+
+                const parent = item.input.parentNode;
+                parent.replaceChild(span, item.input);
+                replacedElements.push({ original: item.input, replacement: span, parent: parent });
+            });
+
+            // Sembunyikan tombol
+            const footerActions = document.querySelector('.footer-actions');
+            footerActions.style.display = 'none';
+
+            // html2canvas untuk mengambil screenshot
+            html2canvas(container, {
+                scale: 2, 
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                // Kembalikan elemen input/select
+                replacedElements.forEach(item => {
+                    item.parent.replaceChild(item.original, item.replacement);
+                });
+
+                // Kembalikan tombol
+                footerActions.style.display = 'block';
+
+                // Simpan gambar
+                const image = canvas.toDataURL('image/jpeg', 0.9); 
+                const link = document.createElement('a');
+                link.href = image;
+                
+                let filename = `FORM_OPEN_BLOCK_${nameToNoPelanggan[originalInputNames] || 'TANPA_NO'}_${new Date().toLocaleDateString('id-ID').replace(/\//g, '-')}.jpg`;
+                link.download = filename;
+                link.click();
+                
+                // Tampilkan Pop-up Konfirmasi
+                alert('File tersimpan ke galeri Anda.');
+
+            }).catch(error => {
+                console.error("Error generating image:", error);
+                alert('Gagal membuat file JPG. Silakan coba lagi.');
+                
+                // Pastikan elemen kembali ke normal jika terjadi error
+                replacedElements.forEach(item => {
+                    if (item.replacement.parentNode) item.parent.replaceChild(item.original, item.replacement);
+                });
+                footerActions.style.display = 'block';
+            });
+        }
+        
+        // --- DATA LOADING DAN FUNGSI LAINNYA ---
+        
         async function loadPiutangData() {
             try {
                 const response = await fetch(pelangganCSV);
@@ -231,7 +392,6 @@
 
             } catch (error) {
                 console.error("Error:", error);
-                alert('Gagal memuat data.csv. Pastikan file ada dan dibuka melalui server.');
             }
         }
 
@@ -285,10 +445,18 @@
             document.getElementById('totalNominal').textContent = formatRupiah(totalPiutang);
         }
 
+        function setTodayDate() {
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = today.toLocaleDateString('id-ID', options);
+            tanggalPengajuanElement.innerHTML = `<em>Pengajuan ini dibuat dan dari data per tanggal ${formattedDate}</em>`;
+        }
+
         inputPelanggan.addEventListener('input', handleInput);
         inputPelanggan.addEventListener('change', handleInput);
 
         loadPiutangData();
+        setTodayDate();
     </script>
 
 </body>
