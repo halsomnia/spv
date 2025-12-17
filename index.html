@@ -42,7 +42,7 @@
         <p style="font-size: 14px;">Permohonan open block order, dengan ini kami lampirkan data toko:</p>
 
         <div class="info-section">
-            <div><label>No Pelanggan</label><span class="separator">:</span><input type="text" id="noPelanggan"></div>
+            <div><label>No Pelanggan</label><span class="separator">:</span><input type="text" id="noPelanggan" readonly style="background-color: #f0f0f0;"></div>
             <div><label>Nama Pelanggan</label><span class="separator">:</span>
                 <input type="text" list="daftarPelanggan" id="namaPelangganInput" placeholder="Ketik atau pilih nama pelanggan..." autocomplete="off">
                 <datalist id="daftarPelanggan"></datalist>
@@ -115,21 +115,23 @@
     <script>
         const pelangganCSV = 'data.csv';
         const inputPelanggan = document.getElementById('namaPelangganInput');
+        const noPelangganInput = document.getElementById('noPelanggan');
         const datalist = document.getElementById('daftarPelanggan');
         const rencanaOrderInput = document.getElementById('rencanaOrder');
         let allPiutangData = [];
         let allPelangganNames = [];
+        let nameToNoPelanggan = {}; // Map nama -> no pelanggan
 
-        // Format rupiah tanpa desimal (bilangan bulat dengan titik ribuan)
+        // Format rupiah tanpa desimal
         function formatRupiah(number) {
             let num = parseFloat(number);
             if (isNaN(num)) return '-';
             return Math.round(num).toLocaleString('id-ID');
         }
 
-        // Format input Rencana Order dengan prefix Rp dan titik ribuan
+        // Format Rencana Order dengan Rp
         function formatRencanaOrder() {
-            let value = rencanaOrderInput.value.replace(/\D/g, ''); // Hanya angka
+            let value = rencanaOrderInput.value.replace(/\D/g, '');
             if (value === '') {
                 rencanaOrderInput.value = '';
                 return;
@@ -158,28 +160,36 @@
                 const csvText = await response.text();
 
                 const rows = csvText.trim().split('\n');
-                const dataRows = rows.slice(1);
+                const dataRows = rows.slice(1); // Lewati header
 
                 const uniqueNames = new Set();
 
                 dataRows.forEach(row => {
                     const columns = row.split(';');
-                    if (columns.length < 3) return;
+                    if (columns.length < 4) return;
 
-                    const nama = columns[0].trim().replace(/"/g, '');
+                    let nama = columns[0].trim().replace(/"/g, '');
                     let umur = columns[1].trim();
+                    let noPel = columns[3].trim().replace(/"/g, '');
                     const nominalStr = columns[2].trim().replace(/,/g, '.');
                     const nominal = parseFloat(nominalStr);
 
                     if (nama && !isNaN(nominal)) {
                         if (umur.startsWith('>')) umur = '>' + umur.slice(1).trim();
                         allPiutangData.push({ nama, umur, nominal });
+
                         uniqueNames.add(nama);
+
+                        // Simpan mapping nama -> no pelanggan (prioritas yang tidak kosong)
+                        if (!nameToNoPelanggan[nama] && noPel) {
+                            nameToNoPelanggan[nama] = noPel;
+                        }
                     }
                 });
 
                 allPelangganNames = [...uniqueNames].sort();
 
+                // Isi datalist
                 datalist.innerHTML = '';
                 allPelangganNames.forEach(nama => {
                     const option = document.createElement('option');
@@ -189,12 +199,21 @@
 
             } catch (error) {
                 console.error("Error:", error);
-                alert('Gagal memuat data.csv. Pastikan file ada dan dibuka melalui server lokal atau GitHub Pages.');
+                alert('Gagal memuat data.csv. Pastikan file ada dan dibuka melalui server.');
             }
         }
 
         function handleInput() {
             const value = inputPelanggan.value.trim();
+
+            // Update No Pelanggan
+            if (value && nameToNoPelanggan[value]) {
+                noPelangganInput.value = nameToNoPelanggan[value];
+            } else {
+                noPelangganInput.value = '';
+            }
+
+            // Update tabel piutang hanya jika nama valid
             if (allPelangganNames.includes(value)) {
                 updatePiutangTable(value);
             } else {
