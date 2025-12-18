@@ -94,8 +94,9 @@
             </thead>
             <tbody>
                 <tr><td></td><td></td><td>1-30</td><td id="nominal-1-30" class="data-nominal"></td><td></td><td></td><td></td></tr>
-                <tr><td></td><td></td><td>30-60</td><td id="nominal-30-60" class="data-nominal"></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td>31-60</td><td id="nominal-31-60" class="data-nominal"></td><td></td><td></td><td></td></tr>
                 <tr><td></td><td></td><td>61-90</td><td id="nominal-61-90" class="data-nominal"></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td>91-120</td><td id="nominal-91-120" class="data-nominal"></td><td></td><td></td><td></td></tr>
                 <tr><td></td><td></td><td>>120</td><td id="nominal-over-120" class="data-nominal"></td><td></td><td></td><td></td></tr>
             </tbody>
             <tfoot>
@@ -318,32 +319,30 @@
         });
 
         function updatePiutangTable(nama) {
-            const ids = ['nominal-1-30', 'nominal-30-60', 'nominal-61-90', 'nominal-over-120'];
+            const ids = ['nominal-1-30', 'nominal-31-60', 'nominal-61-90', 'nominal-91-120', 'nominal-over-120'];
             ids.forEach(id => document.getElementById(id).textContent = '');
             document.getElementById('totalNominal').textContent = '-';
-            
             if (!nama) return;
-
+            
             const filtered = allPiutangData.filter(item => item.nama === nama);
-            const cat = { '1-30': 0, '30-60': 0, '61-90': 0, '>120': 0 };
+            const cat = { '1-30': 0, '31-60': 0, '61-90': 0, '91-120': 0, '>120': 0 };
             let total = 0;
 
             filtered.forEach(item => {
                 total += item.nominal;
-                let age = item.umur;
+                let age = item.umur.trim();
                 
-                if (age === '>120' || age === '91-120') {
-                    age = '>120';
-                }
-
-                if (cat.hasOwnProperty(age)) {
-                    cat[age] += item.nominal;
-                }
+                if (age === '1-30') cat['1-30'] += item.nominal;
+                else if (age === '31-60' || age === '30-60') cat['31-60'] += item.nominal;
+                else if (age === '61-90') cat['61-90'] += item.nominal;
+                else if (age === '91-120') cat['91-120'] += item.nominal;
+                else if (age === '>120') cat['>120'] += item.nominal;
             });
 
             document.getElementById('nominal-1-30').textContent = formatRupiah(cat['1-30']);
-            document.getElementById('nominal-30-60').textContent = formatRupiah(cat['30-60']);
+            document.getElementById('nominal-31-60').textContent = formatRupiah(cat['31-60']);
             document.getElementById('nominal-61-90').textContent = formatRupiah(cat['61-90']);
+            document.getElementById('nominal-91-120').textContent = formatRupiah(cat['91-120']);
             document.getElementById('nominal-over-120').textContent = formatRupiah(cat['>120']);
             document.getElementById('totalNominal').textContent = formatRupiah(total);
         }
