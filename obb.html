@@ -125,14 +125,16 @@
     </div>
 
     <div class="footer-actions">
-        <button class="print-button" onclick="saveAsJpg()" style="display: none;">Simpan JPG</button>
         <button class="print-button pdf-button" onclick="saveAsPdf()">Simpan PDF</button>
     </div>
 
     <datalist id="daftarPelanggan"></datalist>
 
     <script>
-        const pelangganCSV = 'data.csv';
+        // --- PERBAIKAN: GANTI CSV KE GOOGLE SHEETS ---
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbz0skgU0I9-R9THHIAFNpXVdBeOE1XWBbHheParlyknT9XlZUnS_AlxOYXGe-nZ6lngmw/exec'; 
+        // --------------------------------------------
+
         const inputPelanggan = document.getElementById('namaPelangganInput');
         const noPelangganInput = document.getElementById('noPelanggan');
         const rataPembayaranInput = document.getElementById('rataPembayaran');
@@ -224,21 +226,6 @@
             return {replaced, originalValues};
         }
 
-        async function saveAsJpg() {
-            const prep = await prepareForExport();
-            if (!prep) return;
-            window.scrollTo(0, 0);
-            html2canvas(document.getElementById('formContainer'), {scale: 2, useCORS: true}).then(canvas => {
-                prep.replaced.forEach(item => item.parent.replaceChild(item.old, item.new));
-                document.querySelector('.footer-actions').style.display = 'flex';
-                const link = document.createElement('a');
-                link.download = `Pengajuan Open Block - ${prep.originalValues.nama} - ${getFormattedDate()}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 0.9);
-                link.click();
-                alert('File JPG tersimpan.');
-            });
-        }
-
         async function saveAsPdf() {
             const prep = await prepareForExport();
             if (!prep) return;
@@ -274,20 +261,24 @@
             });
         }
 
+        // --- PERBAIKAN: FUNGSI LOAD DATA DARI GOOGLE SHEETS ---
         async function loadPiutangData() {
             try {
-                const response = await fetch(pelangganCSV);
-                const csvText = await response.text();
-                const rows = csvText.trim().split('\n').slice(1);
+                const response = await fetch(scriptURL);
+                const data = await response.json();
+                
+                // Lewati baris header (index 0)
+                const rows = data.slice(1); 
                 const uniqueNames = new Set();
-                rows.forEach(row => {
-                    const columns = row.split(';');
+
+                rows.forEach(columns => {
                     if (columns.length < 5) return; 
-                    let nama = columns[0].trim().replace(/"/g, '');
-                    let umur = columns[1].trim();
-                    let noPel = columns[3].trim().replace(/"/g, '');
-                    let rataRaw = columns[4].trim().replace(/"/g, ''); 
-                    const nominal = parseFloat(columns[2].trim().replace(/,/g, '.'));
+                    let nama = columns[0].toString().trim();
+                    let umur = columns[1].toString().trim();
+                    let nominal = parseFloat(columns[2]);
+                    let noPel = columns[3].toString().trim();
+                    let rataRaw = columns[4].toString().trim();
+
                     if (nama && !isNaN(nominal)) {
                         allPiutangData.push({ nama, umur, nominal });
                         uniqueNames.add(nama);
@@ -295,13 +286,14 @@
                         if (!nameToRataRata[nama]) nameToRataRata[nama] = rataRaw;
                     }
                 });
+
                 allPelangganNames = [...uniqueNames].sort();
                 allPelangganNames.forEach(nama => {
                     const opt = document.createElement('option');
                     opt.value = nama;
                     datalist.appendChild(opt);
                 });
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Gagal load data Google Sheets:", e); }
         }
 
         inputPelanggan.addEventListener('input', () => {
