@@ -23,7 +23,6 @@
         .header{
             background:#000;
             color:#fff;
-            /* UBAH PADDING AGAR HEADER TIDAK TERLALU BESAR SETELAH JUDUL DIPERSINGKAT */
             padding:40px 30px; 
         }
 
@@ -33,16 +32,14 @@
             font-weight:700;
         }
 
-        /* SECTIONS (diubah menjadi list item) */
+        /* SECTIONS */
         .list-section {
             padding: 0 30px;
             list-style: none;
         }
         
-        /* Container untuk setiap item */
         .list-item {
             display: flex; 
-            /* MIDDLE ALIGN (CENTER) untuk item satu baris */
             align-items: center; 
             justify-content: space-between; 
             padding: 16px 0; 
@@ -53,7 +50,6 @@
             border-top: 1px solid #e0e0e0; 
         }
         
-        /* Hapus style untuk title dan desc karena button 3 dihapus */
         .title, .desc {
             display: none; 
         }
@@ -63,7 +59,6 @@
             padding-right: 15px; 
         }
         
-        /* Link di dalam list item */
         .list-item a.link {
             color: #000000;
             text-decoration: none;
@@ -72,7 +67,6 @@
             display: block;
         }
         
-        /* Tombol panah (Arrow Button) - Ukuran seragam 40x40px */
         .arrow-btn {
             background: #e0e0e0; 
             border-radius: 50%; 
@@ -95,15 +89,13 @@
             background: #cccccc; 
         }
         
-        /* Hide the original .btn */
         .btn {
             display: none !important;
         }
 
-        /* Media Query untuk Mobile */
         @media(max-width:500px){
             .header {
-                padding: 30px 20px; /* Kurangi padding header di mobile */
+                padding: 30px 20px; 
             }
             .header h1{
                 font-size:1.9em;
@@ -115,7 +107,6 @@
                 font-size:1.1em;
             }
             
-            /* Tombol panah di mobile tetap 40px */
             .arrow-btn {
                 width: 40px;
                 min-width: 40px;
@@ -140,6 +131,15 @@
                 </a>
             </div>
             <a href="openblock.html" class="arrow-btn">&#x2794;</a>
+        </li>
+
+        <li class="list-item">
+            <div class="list-item-content">
+                <a class="link" href="penjualan.html">
+                    Laporan Penjualan
+                </a>
+            </div>
+            <a href="penjualan.html" class="arrow-btn">&#x2794;</a>
         </li>
 
     </ul>
