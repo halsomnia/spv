@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Penjualan Per Pelanggan</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-black: #000000;
+            --light-gray: #f9f9f9;
+            --border-color: #eeeeee;
+        }
+
+        /* --- TAMPILAN DESKTOP --- */
+        body {
+            margin: 0; font-family: 'DM Sans', sans-serif;
+            background: #f4f4f4; color: var(--primary-black);
+            padding: 20px; display: flex; flex-direction: column; align-items: center;
+        }
+
+        .container {
+            width: 100%; max-width: 650px; background: #ffffff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-radius: 20px;
+            overflow: hidden; position: relative; margin-bottom: 20px;
+        }
+
+        #report-area { padding: 30px; }
+
+        .header-title {
+            background: var(--primary-black); color: #ffffff;
+            padding: 40px 30px; margin: -30px -30px 30px -30px;
+            border-radius: 0 0 20px 20px; text-align: center;
+        }
+
+        .header-title h1 { 
+            margin: 0; 
+            font-size: clamp(1.2rem, 6.5vw, 1.8rem); 
+            font-weight: 700; 
+            white-space: nowrap;
+        }
+
+        .filter-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+
+        .filter-item { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; position: relative; }
+
+        .search-pelanggan-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .search-input-main {
+            width: 100%; padding: 12px; border: 1.5px solid var(--primary-black); 
+            border-radius: 8px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+            font-size: 0.9em; box-sizing: border-box; outline: none;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 95% center;
+            background-size: 18px;
+        }
+
+        select, .dropdown-trigger {
+            padding: 10px; border: 1.5px solid var(--primary-black); border-radius: 8px;
+            font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.85em;
+            outline: none; background: white; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .checkbox-dropdown-list {
+            position: absolute; top: 100%; left: 0; right: 0;
+            background: white; border: 1.5px solid var(--primary-black); border-radius: 8px;
+            margin-top: 5px; padding: 10px; max-height: 200px; overflow-y: auto;
+            z-index: 100; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .checkbox-dropdown-list.active { display: block; }
+
+        .checkbox-item {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.85em; font-weight: 500; padding: 8px 0;
+            cursor: pointer; border-bottom: 1px solid #f0f0f0;
+        }
+
+        .checkbox-item input { width: 18px; height: 18px; accent-color: var(--primary-black); }
+
+        .table-container {
+            width: 100%; border-radius: 12px; overflow: hidden;
+            border: 1px solid var(--border-color); margin-bottom: 10px;
+        }
+
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+
+        thead th {
+            background: var(--primary-black); color: #ffffff;
+            font-size: 0.75em; text-transform: uppercase;
+            padding: 15px 5px; cursor: pointer; user-select: none;
+        }
+
+        .col-sales { width: 25%; }
+        .col-pelanggan { width: 50%; }
+        .col-jumlah { width: 25%; }
+
+        tbody td {
+            padding: 12px 8px; border-bottom: 1px solid var(--border-color);
+            font-size: 0.85em; overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        .pelanggan-cell { cursor: pointer; transition: background 0.2s; }
+        .pelanggan-cell:active { background: #f0f0f0; }
+
+        tbody tr:nth-child(even) { background-color: var(--light-gray); }
+
+        .total-row td {
+            background: var(--primary-black) !important; color: #ffffff;
+            font-weight: 700; padding: 15px 8px;
+        }
+
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+
+        /* --- STYLING MODAL PIN --- */
+        #pin-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal-content {
+            background: #fff; padding: 30px; border-radius: 15px; width: 90%; max-width: 320px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .modal-content h3 { margin-top: 0; font-weight: 700; }
+        .modal-content input {
+            width: 100%; padding: 12px; margin: 20px 0; border: 1.5px solid #ddd;
+            border-radius: 8px; font-size: 1.2rem; text-align: center; letter-spacing: 5px;
+            box-sizing: border-box; outline: none;
+        }
+        .modal-content input:focus { border-color: var(--primary-black); }
+        .modal-content button {
+            width: 100%; padding: 12px; background: var(--primary-black); color: #fff;
+            border: none; border-radius: 8px; font-weight: 700; cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 0; background: #fff; }
+            .container { max-width: 100%; border-radius: 0; box-shadow: none; }
+            #report-area { padding: 15px 10px; }
+            .header-title { margin: -15px -10px 20px -10px; padding: 30px 15px; border-radius: 0; }
+            .header-title h1 { font-size: 6.5vw; }
+        }
+
+        #loader-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-black); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="pin-modal">
+        <div class="modal-content">
+            <h3>Akses Terbatas</h3>
+            <p style="font-size: 0.85em; color: #666;">Silakan masukkan PIN Keamanan</p>
+            <input type="password" id="inputPinField" maxlength="8" placeholder="****">
+            <button onclick="checkPin()">Buka Laporan</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="loader-overlay">
+            <div class="spinner"></div>
+            <p style="margin-top: 15px; font-weight: 500; font-size: 0.8em;">Sinkronisasi Data...</p>
+        </div>
+
+        <div id="report-area">
+            <div class="header-title">
+                <h1>Penjualan Per Pelanggan</h1>
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label style="font-size: 0.7em; font-weight: 700; color: #888;">TAHUN</label>
+                    <select id="selTahun" onchange="renderLaporan()"></select>
+                </div>
+                <div class="filter-item">
+                    <label style="font-size: 0.7em; font-weight: 700; color: #888;">BULAN</label>
+                    <select id="selBulan" onchange="renderLaporan()"></select>
+                </div>
+                
+                <div class="filter-item">
+                    <label style="font-size: 0.7em; font-weight: 700; color: #888;">SALES</label>
+                    <div class="dropdown-trigger" onclick="toggleDropdown('salesDropdown')">
+                        <span id="salesLabel">Semua Sales</span>
+                        <span>▼</span>
+                    </div>
+                    <div id="salesDropdown" class="checkbox-dropdown-list">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="checkAllSales" checked onclick="toggleAll('sales', this)"> 
+                            <strong>PILIH SEMUA</strong>
+                        </label>
+                        <div id="listSales"></div>
+                    </div>
+                </div>
+
+                <div class="filter-item">
+                    <label style="font-size: 0.7em; font-weight: 700; color: #888;">KATEGORI</label>
+                    <div class="dropdown-trigger" onclick="toggleDropdown('katDropdown')">
+                        <span id="kategoriLabel">Semua Terpilih</span>
+                        <span>▼</span>
+                    </div>
+                    <div id="katDropdown" class="checkbox-dropdown-list">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="checkAllKat" checked onclick="toggleAll('kat', this)"> 
+                            <strong>PILIH SEMUA</strong>
+                        </label>
+                        <div id="listKategori"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-pelanggan-container">
+                <input list="pelangganList" id="searchPelanggan" class="search-input-main" placeholder="Cari Pelanggan..." oninput="renderLaporan()">
+                <datalist id="pelangganList"></datalist>
+            </div>
+
+            <div class="table-container">
+                <table id="reportTable">
+                    <thead>
+                        <tr>
+                            <th class="text-left col-sales" style="padding-left:15px" onclick="sortTable(0)">Sales ⇅</th>
+                            <th class="text-left col-pelanggan" onclick="sortTable(1)">Pelanggan ⇅</th>
+                            <th class="text-right col-jumlah" style="padding-right:15px" onclick="sortTable(2)">Jumlah ⇅</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="2" class="text-center">Total</td>
+                            <td id="grandTotal" class="text-right" style="padding-right:15px">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const urlAPI = "https://script.google.com/macros/s/AKfycbzZpkowxQntzV8XtzkF49Zi8yVkw9OI9QNde7pF0dTlpUCw98neszBLR5OIHnXnSUEk/exec"; 
+    let masterPenjualan = [];
+    let correctPin = "";
+    let cachedData = null;
+    let currentSort = { column: null, direction: 'asc' };
+    const urutanBulan = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    async function init() {
+        try {
+            const res = await fetch(urlAPI);
+            const data = await res.json();
+            cachedData = data;
+            correctPin = data.pin;
+            
+            // Tampilkan Modal PIN setelah data siap
+            document.getElementById('pin-modal').style.display = 'flex';
+        } catch (e) { alert("Gagal sinkronisasi data."); }
+    }
+
+    function checkPin() {
+        const inputVal = document.getElementById('inputPinField').value;
+        if (inputVal == correctPin) {
+            masterPenjualan = cachedData.penjualan;
+            document.getElementById('pin-modal').style.display = 'none';
+            document.getElementById('loader-overlay').style.display = 'none';
+            populateFilters();
+            renderLaporan();
+        } else {
+            alert("PIN Salah!");
+            document.getElementById('inputPinField').value = "";
+        }
+    }
+
+    // Menangani enter pada input PIN
+    document.getElementById('inputPinField').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') checkPin();
+    });
+
+    function populateFilters() {
+        const tahunSet = [...new Set(masterPenjualan.map(item => item.Tahun))].sort((a, b) => b - a);
+        const bulanUnik = [...new Set(masterPenjualan.map(item => item.Bulan))];
+        const salesSet = [...new Set(masterPenjualan.map(item => item.Sales))].filter(s => s).sort();
+        const kategoriSet = [...new Set(masterPenjualan.map(item => item.Kategori))].filter(k => k).sort();
+        const pelangganSet = [...new Set(masterPenjualan.map(item => item.Pelanggan))].filter(p => p).sort();
+
+        const bulanSorted = bulanUnik.sort((a, b) => urutanBulan.indexOf(a.substring(0,3)) - urutanBulan.indexOf(b.substring(0,3)));
+
+        const selTahun = document.getElementById('selTahun');
+        const selBulan = document.getElementById('selBulan');
+        const listSales = document.getElementById('listSales');
+        const listKategori = document.getElementById('listKategori');
+        const datalistPelanggan = document.getElementById('pelangganList');
+
+        tahunSet.forEach(t => selTahun.innerHTML += `<option value="${t}">${t}</option>`);
+        bulanSorted.forEach(b => selBulan.innerHTML += `<option value="${b}">${b}</option>`);
+        salesSet.forEach(s => { listSales.innerHTML += `<label class="checkbox-item"><input type="checkbox" name="sales" value="${s}" checked onclick="onCheckChange('sales')"> ${s}</label>`; });
+        kategoriSet.forEach(k => { listKategori.innerHTML += `<label class="checkbox-item"><input type="checkbox" name="kat" value="${k}" checked onclick="onCheckChange('kat')"> ${k}</label>`; });
+        
+        pelangganSet.forEach(p => { datalistPelanggan.innerHTML += `<option value="${p}">`; });
+
+        const now = new Date();
+        selTahun.value = now.getFullYear();
+        const matchedBulan = bulanSorted.find(b => b.includes(urutanBulan[now.getMonth()]));
+        if (matchedBulan) selBulan.value = matchedBulan;
+    }
+
+    function toggleDropdown(id) {
+        const el = document.getElementById(id);
+        const isActive = el.classList.contains('active');
+        document.querySelectorAll('.checkbox-dropdown-list').forEach(d => d.classList.remove('active'));
+        if(!isActive) el.classList.add('active');
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.closest('.filter-item')) {
+            document.querySelectorAll('.checkbox-dropdown-list').forEach(d => d.classList.remove('active'));
+        }
+    }
+
+    function toggleAll(name, source) {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(cb => cb.checked = source.checked);
+        onCheckChange(name);
+    }
+
+    function onCheckChange(name) {
+        const total = document.querySelectorAll(`input[name="${name}"]`).length;
+        const checked = document.querySelectorAll(`input[name="${name}"]:checked`).length;
+        if(name === 'sales') {
+            document.getElementById('checkAllSales').checked = (total === checked);
+            document.getElementById('salesLabel').innerText = checked === total ? "Semua Sales" : (checked === 0 ? "Tidak Ada" : `${checked} Sales`);
+        } else {
+            document.getElementById('checkAllKat').checked = (total === checked);
+            document.getElementById('kategoriLabel').innerText = checked === total ? "Semua Terpilih" : (checked === 0 ? "Tidak Ada" : `${checked} Terpilih`);
+        }
+        renderLaporan();
+    }
+
+    function sortTable(columnIndex) {
+        if (currentSort.column === columnIndex) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = columnIndex;
+            currentSort.direction = 'asc';
+        }
+        renderLaporan();
+    }
+
+    function toggleText(element) {
+        element.style.whiteSpace = (element.style.whiteSpace === 'normal') ? 'nowrap' : 'normal';
+    }
+
+    function renderLaporan() {
+        const thn = parseInt(document.getElementById('selTahun').value);
+        const bln = document.getElementById('selBulan').value;
+        const searchTxt = document.getElementById('searchPelanggan').value.toLowerCase();
+        const selectedSales = Array.from(document.querySelectorAll('input[name="sales"]:checked')).map(cb => cb.value);
+        const selectedKats = Array.from(document.querySelectorAll('input[name="kat"]:checked')).map(cb => cb.value);
+        
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = "";
+        
+        let filtered = masterPenjualan.filter(d => 
+            d.Tahun == thn && 
+            d.Bulan == bln && 
+            selectedKats.includes(d.Kategori) && 
+            selectedSales.includes(d.Sales)
+        );
+
+        const grouped = {};
+        let grandTotal = 0;
+
+        filtered.forEach(row => {
+            const pelangganName = row["Pelanggan"] || "TANPA NAMA";
+            if (pelangganName.toLowerCase().includes(searchTxt)) {
+                if (!grouped[pelangganName]) grouped[pelangganName] = { sales: row["Sales"] || "-", total: 0 };
+                const val = Math.round(parseFloat(row["Jumlah (Inc)"]) || 0);
+                grouped[pelangganName].total += val;
+                grandTotal += val;
+            }
+        });
+
+        let dataArray = Object.keys(grouped).map(p => ({ pelanggan: p, sales: grouped[p].sales, total: grouped[p].total }));
+
+        if (currentSort.column !== null) {
+            dataArray.sort((a, b) => {
+                let valA, valB;
+                if (currentSort.column === 0) { valA = a.sales; valB = b.sales; }
+                else if (currentSort.column === 1) { valA = a.pelanggan; valB = b.pelanggan; }
+                else { valA = a.total; valB = b.total; }
+                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        dataArray.forEach(item => {
+            tbody.innerHTML += `<tr>
+                <td class="text-left" style="padding-left:15px">${item.sales}</td>
+                <td class="text-left pelanggan-cell" onclick="toggleText(this)" title="Klik untuk lihat nama lengkap">${item.pelanggan}</td>
+                <td class="text-right" style="padding-right:15px">${item.total.toLocaleString('id-ID')}</td>
+            </tr>`;
+        });
+
+        document.getElementById('grandTotal').innerText = grandTotal.toLocaleString('id-ID');
+    }
+
+    init();
+</script>
+</body>
+</html>
