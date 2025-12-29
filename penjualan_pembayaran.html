@@ -66,23 +66,24 @@
         .filter-group {
             display: flex;
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .filter-item {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 3px;
             flex: 1;
         }
 
         select {
-            padding: 10px;
+            padding: 6px;
             border: 1.5px solid var(--primary-black);
             border-radius: 8px;
             font-family: 'DM Sans', sans-serif;
             font-weight: 500;
             outline: none;
+			line-height: 1.2;
         }
 
         .table-container, .summary-container {
@@ -103,16 +104,18 @@
             color: #ffffff;
             font-size: 0.75em;
             text-transform: uppercase;
-            padding: 12px 5px;
+            padding: 6px 8px;
             border-right: 1px solid rgba(255,255,255,0.2);
+			
         }
 
         thead th:last-child { border-right: none; }
 
         tbody td {
-            padding: 12px 8px;
+            padding: 6px 8px;
             border-bottom: 1px solid var(--border-color);
             font-size: 0.85em;
+			line-height: 1.2;
         }
 
         tbody tr:nth-child(even) { background-color: var(--light-gray); }
