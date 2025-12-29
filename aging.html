@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Laporan Aging Piutang</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-black: #000000;
+            --light-gray: #f9f9f9;
+            --border-color: #eeeeee;
+            --danger-red: #ff0000;
+        }
+
+        body {
+            margin: 0; font-family: 'DM Sans', sans-serif;
+            background: #f4f4f4; color: var(--primary-black);
+            padding: 20px; display: flex; flex-direction: column; align-items: center;
+        }
+
+        .container {
+            width: 100%; max-width: 1000px; background: #ffffff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-radius: 20px;
+            overflow: hidden; position: relative; margin-bottom: 20px;
+        }
+
+        #report-area { padding: 30px; }
+
+        .header-title {
+            background: var(--primary-black); color: #ffffff;
+            padding: 40px 30px; margin: -30px -30px 30px -30px;
+            border-radius: 0 0 20px 20px; text-align: center;
+        }
+
+        .header-title h1 { 
+            margin: 0; 
+            font-size: clamp(1.2rem, 6.5vw, 1.8rem); 
+            font-weight: 700; 
+            white-space: nowrap;
+        }
+
+        /* --- FILTER (Satu Baris) --- */
+        .filter-group { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+            flex-wrap: nowrap;
+        }
+
+        .filter-item { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 5px; 
+            flex: 1; 
+            min-width: 0;
+            position: relative; 
+        }
+
+        .search-pelanggan-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .search-input-main {
+            width: 100%; padding: 12px; border: 1.5px solid var(--primary-black); 
+            border-radius: 8px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+            font-size: 0.9em; box-sizing: border-box; outline: none;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 95% center;
+            background-size: 18px;
+        }
+
+        select, .dropdown-trigger {
+            padding: 10px; border: 1.5px solid var(--primary-black); border-radius: 8px;
+            font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.85em;
+            outline: none; background: white; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            white-space: nowrap; overflow: hidden;
+        }
+
+        .checkbox-dropdown-list {
+            position: absolute; top: 100%; left: 0; right: 0;
+            background: white; border: 1.5px solid var(--primary-black); border-radius: 8px;
+            margin-top: 5px; padding: 10px; max-height: 200px; overflow-y: auto;
+            z-index: 100; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .checkbox-dropdown-list.active { display: block; }
+
+        .checkbox-item {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.85em; font-weight: 500; padding: 8px 0;
+            cursor: pointer; border-bottom: 1px solid #f0f0f0;
+        }
+
+        .checkbox-item input { width: 18px; height: 18px; accent-color: var(--primary-black); }
+
+        /* --- TABEL --- */
+        .table-container {
+            width: 100%; border-radius: 12px; overflow-x: auto;
+            border: 1px solid var(--border-color); margin-bottom: 10px;
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            table-layout: auto;
+        }
+
+        thead th {
+            background: var(--primary-black); color: #ffffff;
+            font-size: 0.75em; text-transform: uppercase;
+            padding: 15px 8px; cursor: pointer; user-select: none;
+            white-space: nowrap;
+        }
+
+        tbody td {
+            padding: 12px 8px; border-bottom: 1px solid var(--border-color);
+            font-size: 0.85em;
+            white-space: nowrap;
+        }
+
+        /* MODIFIKASI: Kolom Pelanggan Tetap (Truncate) tapi Melebar saat ditekan */
+        .pelanggan-cell { 
+            cursor: pointer; 
+            transition: background 0.2s; 
+            max-width: 150px; /* Lebar kolom tetap */
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap;
+        }
+        .pelanggan-cell:active { background: #f0f0f0; }
+
+        /* MODIFIKASI: Umur merah jika >= 120 */
+        .umur-warning {
+            color: var(--danger-red);
+            font-weight: 700;
+        }
+
+        tbody tr:nth-child(even) { background-color: var(--light-gray); }
+
+        .total-row td {
+            background: var(--primary-black) !important; color: #ffffff;
+            font-weight: 700; padding: 15px 8px;
+        }
+
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+
+        /* --- MODAL PIN --- */
+        #pin-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal-content {
+            background: #fff; padding: 30px; border-radius: 15px; width: 90%; max-width: 320px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .modal-content input {
+            width: 100%; padding: 12px; margin: 20px 0; border: 1.5px solid #ddd;
+            border-radius: 8px; font-size: 1.2rem; text-align: center; letter-spacing: 5px;
+            box-sizing: border-box; outline: none;
+        }
+        .modal-content button {
+            width: 100%; padding: 12px; background: var(--primary-black); color: #fff;
+            border: none; border-radius: 8px; font-weight: 700; cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 0; background: #fff; }
+            .container { max-width: 100%; border-radius: 0; box-shadow: none; }
+            #report-area { padding: 15px 10px; }
+            .header-title { margin: -15px -10px 20px -10px; padding: 30px 15px; border-radius: 0; }
+            .dropdown-trigger { font-size: 0.75em; padding: 8px; }
+        }
+
+        #loader-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-black); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="pin-modal">
+        <div class="modal-content">
+            <h3>Akses Terbatas</h3>
+            <p style="font-size: 0.85em; color: #666;">Masukkan PIN Keamanan</p>
+            <input type="password" id="inputPinField" maxlength="8" placeholder="****">
+            <button onclick="checkPin()">Buka Laporan</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="loader-overlay">
+            <div class="spinner"></div>
+            <p style="margin-top: 15px; font-weight: 500; font-size: 0.8em;">Sinkronisasi Data...</p>
+        </div>
+
+        <div id="report-area">
+            <div class="header-title">
+                <h1>Aging Piutang</h1>
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label style="font-size: 0.7em; font-weight: 700; color: #888;">SALES</label>
+                    <div class="dropdown-trigger" onclick="toggleDropdown('salesDropdown')">
+                        <span id="salesLabel">Semua Sales</span>
+                        <span>▼</span>
+                    </div>
+                    <div id="salesDropdown" class="checkbox-dropdown-list">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="checkAllSales" checked onclick="toggleAll('sales', this)"> 
+                            <strong>PILIH SEMUA</strong>
+                        </label>
+                        <div id="listSales"></div>
+                    </div>
+                </div>
+
+                <div class="filter-item">
+                    <label style="font-size: 0.7em; font-weight: 700; color: #888;">UMUR GROUP</label>
+                    <div class="dropdown-trigger" onclick="toggleDropdown('umurDropdown')">
+                        <span id="umurLabel">Semua Umur</span>
+                        <span>▼</span>
+                    </div>
+                    <div id="umurDropdown" class="checkbox-dropdown-list">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="checkAllUmur" checked onclick="toggleAll('umur', this)"> 
+                            <strong>PILIH SEMUA</strong>
+                        </label>
+                        <div id="listUmur"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-pelanggan-container">
+                <input list="pelangganList" id="searchPelanggan" class="search-input-main" placeholder="Cari Pelanggan..." oninput="renderLaporan()">
+                <datalist id="pelangganList"></datalist>
+            </div>
+
+            <div class="table-container">
+                <table id="reportTable">
+                    <thead>
+                        <tr>
+                            <th class="text-left" onclick="sortTable(0)">Pelanggan ⇅</th>
+                            <th class="text-left" onclick="sortTable(1)">No. Faktur ⇅</th>
+                            <th class="text-center" onclick="sortTable(2)">Tgl Faktur ⇅</th>
+                            <th class="text-center" onclick="sortTable(3)">Tgl Cek ⇅</th>
+                            <th class="text-center" onclick="sortTable(4)">Umur ⇅</th>
+                            <th class="text-right" onclick="sortTable(5)">Jumlah ⇅</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="5" class="text-center">TOTAL</td>
+                            <td id="grandTotal" class="text-right">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const urlAPI = "https://script.google.com/macros/s/AKfycbyxdtsuysDhPBro2k5xEWPYL0wf6qmG3ecsIlCEEeRDGxvJx-XcIXltFICkRg7rvytQ/exec"; 
+    let masterAging = [];
+    let correctPin = "";
+    let cachedData = null;
+    let currentSort = { column: 0, direction: 'asc' }; 
+    
+    function formatTanggal(dateStr) {
+        if (!dateStr || dateStr === "(blank)") return "-";
+        try {
+            let date;
+            if (dateStr.includes('/')) {
+                const parts = dateStr.split('/');
+                date = new Date(parts[2], parts[0] - 1, parts[1]);
+            } else {
+                date = new Date(dateStr);
+            }
+            if (isNaN(date.getTime())) return dateStr;
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        } catch (e) { return dateStr; }
+    }
+
+    async function init() {
+        try {
+            const res = await fetch(urlAPI);
+            const data = await res.json();
+            cachedData = data;
+            correctPin = data.pin;
+            document.getElementById('pin-modal').style.display = 'flex';
+            document.getElementById('loader-overlay').style.display = 'none';
+        } catch (e) { alert("Error: " + e.message); }
+    }
+
+    function checkPin() {
+        const inputVal = document.getElementById('inputPinField').value;
+        if (inputVal == correctPin) {
+            masterAging = cachedData.aging || cachedData.sheet5 || [];
+            document.getElementById('pin-modal').style.display = 'none';
+            populateFilters();
+            renderLaporan();
+        } else {
+            alert("PIN Salah!");
+            document.getElementById('inputPinField').value = "";
+        }
+    }
+
+    document.getElementById('inputPinField').addEventListener('keypress', (e) => { if (e.key === 'Enter') checkPin(); });
+
+    function populateFilters() {
+        const salesSet = [...new Set(masterAging.map(item => item.SALES))].filter(s => s).sort();
+        const umurSet = [...new Set(masterAging.map(item => item["UMUR GRUP"]))].filter(u => u).sort();
+        const pelangganSet = [...new Set(masterAging.map(item => item.PELANGGAN))].filter(p => p).sort();
+
+        const listSales = document.getElementById('listSales');
+        const listUmur = document.getElementById('listUmur');
+        const datalistPelanggan = document.getElementById('pelangganList');
+
+        salesSet.forEach(s => { listSales.innerHTML += `<label class="checkbox-item"><input type="checkbox" name="sales" value="${s}" checked onclick="onCheckChange('sales')"> ${s}</label>`; });
+        umurSet.forEach(u => { listUmur.innerHTML += `<label class="checkbox-item"><input type="checkbox" name="umur" value="${u}" checked onclick="onCheckChange('umur')"> ${u}</label>`; });
+        pelangganSet.forEach(p => { datalistPelanggan.innerHTML += `<option value="${p}">`; });
+    }
+
+    function toggleDropdown(id) {
+        const el = document.getElementById(id);
+        const isActive = el.classList.contains('active');
+        document.querySelectorAll('.checkbox-dropdown-list').forEach(d => d.classList.remove('active'));
+        if(!isActive) el.classList.add('active');
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.closest('.filter-item')) {
+            document.querySelectorAll('.checkbox-dropdown-list').forEach(d => d.classList.remove('active'));
+        }
+    }
+
+    function toggleAll(name, source) {
+        document.querySelectorAll(`input[name="${name}"]`).forEach(cb => cb.checked = source.checked);
+        onCheckChange(name);
+    }
+
+    function onCheckChange(name) {
+        const total = document.querySelectorAll(`input[name="${name}"]`).length;
+        const checked = document.querySelectorAll(`input[name="${name}"]:checked`).length;
+        if(name === 'sales') {
+            document.getElementById('salesLabel').innerText = checked === total ? "Semua Sales" : (checked === 0 ? "Tidak Ada" : `${checked} Sales`);
+        } else if(name === 'umur') {
+            document.getElementById('umurLabel').innerText = checked === total ? "Semua Umur" : (checked === 0 ? "Tidak Ada" : `${checked} Terpilih`);
+        }
+        renderLaporan();
+    }
+
+    function sortTable(columnIndex) {
+        if (currentSort.column === columnIndex) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = columnIndex;
+            currentSort.direction = 'asc';
+        }
+        renderLaporan();
+    }
+
+    function toggleText(element) {
+        if (element.style.whiteSpace === 'normal') {
+            element.style.whiteSpace = 'nowrap';
+            element.style.maxWidth = '150px';
+        } else {
+            element.style.whiteSpace = 'normal';
+            element.style.maxWidth = 'none';
+        }
+    }
+
+    function renderLaporan() {
+        const searchTxt = document.getElementById('searchPelanggan').value.toLowerCase();
+        const selectedSales = Array.from(document.querySelectorAll('input[name="sales"]:checked')).map(cb => cb.value);
+        const selectedUmur = Array.from(document.querySelectorAll('input[name="umur"]:checked')).map(cb => cb.value);
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = "";
+        
+        let filtered = masterAging.filter(d => {
+            const sales = d.SALES || "";
+            const umurGrup = d["UMUR GRUP"] || "";
+            const pelanggan = d.PELANGGAN || "";
+            return selectedSales.includes(sales) && selectedUmur.includes(umurGrup) && pelanggan.toLowerCase().includes(searchTxt);
+        });
+
+        filtered.sort((a, b) => {
+            let valA, valB;
+            if (currentSort.column === 0) valA = (a.PELANGGAN || "").toLowerCase();
+            else if (currentSort.column === 4) valA = parseInt(a.UMUR) || 0;
+            else if (currentSort.column === 5) valA = parseFloat(a.JUMLAH) || 0;
+            else valA = a[Object.keys(a)[currentSort.column]] || "";
+            
+            if (currentSort.column === 0) valB = (b.PELANGGAN || "").toLowerCase();
+            else if (currentSort.column === 4) valB = parseInt(b.UMUR) || 0;
+            else if (currentSort.column === 5) valB = parseFloat(b.JUMLAH) || 0;
+            else valB = b[Object.keys(b)[currentSort.column]] || "";
+
+            return (valA < valB ? -1 : 1) * (currentSort.direction === 'asc' ? 1 : -1);
+        });
+
+        let grandTotal = 0;
+        const fragment = document.createDocumentFragment();
+
+        filtered.forEach(item => {
+            const numUmur = parseInt(item.UMUR) || 0;
+            const jumlah = Math.round(parseFloat(item.JUMLAH || 0));
+            grandTotal += jumlah;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="text-left pelanggan-cell" onclick="toggleText(this)">${item.PELANGGAN || "-"}</td>
+                <td class="text-left">${item["NO FAKTUR"] || "-"}</td>
+                <td class="text-center">${formatTanggal(item["TGL FAKTUR"])}</td>
+                <td class="text-center">${formatTanggal(item["TGL CEK"])}</td>
+                <td class="text-center ${numUmur >= 120 ? 'umur-warning' : ''}">${numUmur}</td>
+                <td class="text-right">${jumlah.toLocaleString('id-ID')}</td>
+            `;
+            fragment.appendChild(tr);
+        });
+
+        tbody.appendChild(fragment);
+        document.getElementById('grandTotal').innerText = grandTotal.toLocaleString('id-ID');
+    }
+
+    init();
+</script>
+</body>
+</html>
