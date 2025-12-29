@@ -16,7 +16,7 @@
             --border-color: #eeeeee;
         }
 
-        /* --- TAMPILAN DESKTOP --- */
+        /* --- TAMPILAN UMUM/DESKTOP --- */
         body {
             margin: 0; font-family: 'DM Sans', sans-serif;
             background: #f4f4f4; color: var(--primary-black);
@@ -24,7 +24,7 @@
         }
 
         .container {
-            width: 100%; max-width: 650px; background: #ffffff;
+            width: 100%; max-width: 800px; background: #ffffff;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-radius: 20px;
             overflow: hidden; position: relative; margin-bottom: 20px;
         }
@@ -90,7 +90,15 @@
             border: 1px solid var(--border-color); margin-bottom: 10px;
         }
 
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        table { 
+            width: 100%; border-collapse: collapse; table-layout: fixed; 
+        }
+        
+        /* Lebar kolom desktop */
+        .col-sales { width: 100px; }
+        .col-pelanggan { width: auto; }
+        .col-bulan { width: 80px; }
+        .col-jumlah { width: 120px; }
 
         thead th {
             background: var(--primary-black); color: #ffffff;
@@ -98,24 +106,25 @@
             padding: 15px 5px; cursor: pointer; user-select: none;
         }
 
-        .col-sales { width: 25%; }
-        .col-pelanggan { width: 50%; }
-        .col-jumlah { width: 25%; }
-
         tbody td {
             padding: 12px 8px; border-bottom: 1px solid var(--border-color);
             font-size: 0.85em; overflow: hidden;
             text-overflow: ellipsis; white-space: nowrap;
         }
 
-        .pelanggan-cell { cursor: pointer; transition: background 0.2s; }
+        /* Styling Kolom Pelanggan */
+        .pelanggan-cell { 
+            cursor: pointer; 
+            transition: background 0.2s;
+            max-width: 0; /* Penting agar ellipsis bekerja di table-layout fixed */
+        }
         .pelanggan-cell:active { background: #f0f0f0; }
 
         tbody tr:nth-child(even) { background-color: var(--light-gray); }
 
         .total-row td {
             background: var(--primary-black) !important; color: #ffffff;
-            font-weight: 700; padding: 15px 8px;
+            font-weight: 700; padding: 15px 8px; border-bottom: none;
         }
 
         .text-right { text-align: right; }
@@ -144,12 +153,27 @@
             border: none; border-radius: 8px; font-weight: 700; cursor: pointer;
         }
 
+        /* --- TAMPILAN PONSEL (RESPONSIVE) --- */
         @media (max-width: 600px) {
             body { padding: 0; background: #fff; }
             .container { max-width: 100%; border-radius: 0; box-shadow: none; }
             #report-area { padding: 15px 10px; }
             .header-title { margin: -15px -10px 20px -10px; padding: 30px 15px; border-radius: 0; }
             .header-title h1 { font-size: 6.5vw; }
+
+            .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            
+            table { table-layout: auto; min-width: 500px; }
+
+            .col-sales { width: 30px !important; min-width: 30px; }
+            
+            /* Penyesuaian Kolom Pelanggan di Ponsel */
+            .col-pelanggan { 
+                min-width: 180px; 
+                max-width: 220px; /* Batasi lebar agar teks terpotong */
+            }
+            
+            .col-bulan, .col-jumlah { width: auto !important; }
         }
 
         #loader-overlay {
@@ -190,7 +214,17 @@
                 </div>
                 <div class="filter-item">
                     <label style="font-size: 0.7em; font-weight: 700; color: #888;">BULAN</label>
-                    <select id="selBulan" onchange="renderLaporan()"></select>
+                    <div class="dropdown-trigger" onclick="toggleDropdown('bulanDropdown')">
+                        <span id="bulanLabel">Semua Bulan</span>
+                        <span>▼</span>
+                    </div>
+                    <div id="bulanDropdown" class="checkbox-dropdown-list">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="checkAllBulan" checked onclick="toggleAll('bulan', this)"> 
+                            <strong>PILIH SEMUA</strong>
+                        </label>
+                        <div id="listBulan"></div>
+                    </div>
                 </div>
                 
                 <div class="filter-item">
@@ -235,13 +269,14 @@
                         <tr>
                             <th class="text-left col-sales" style="padding-left:15px" onclick="sortTable(0)">Sales ⇅</th>
                             <th class="text-left col-pelanggan" onclick="sortTable(1)">Pelanggan ⇅</th>
-                            <th class="text-right col-jumlah" style="padding-right:15px" onclick="sortTable(2)">Jumlah ⇅</th>
+                            <th class="text-left col-bulan" onclick="sortTable(2)">Bulan ⇅</th>
+                            <th class="text-right col-jumlah" style="padding-right:15px" onclick="sortTable(3)">Jumlah ⇅</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
                     <tfoot>
                         <tr class="total-row">
-                            <td colspan="2" class="text-center">Total</td>
+                            <td colspan="3" class="text-right" style="padding-right:15px">Total</td>
                             <td id="grandTotal" class="text-right" style="padding-right:15px">0</td>
                         </tr>
                     </tfoot>
@@ -265,9 +300,11 @@
             cachedData = data;
             correctPin = data.pin;
             
-            // Tampilkan Modal PIN setelah data siap
             document.getElementById('pin-modal').style.display = 'flex';
-        } catch (e) { alert("Gagal sinkronisasi data."); }
+        } catch (e) { 
+            alert("Gagal sinkronisasi data: " + e.message); 
+            console.error("Error detail:", e);
+        }
     }
 
     function checkPin() {
@@ -284,7 +321,6 @@
         }
     }
 
-    // Menangani enter pada input PIN
     document.getElementById('inputPinField').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') checkPin();
     });
@@ -299,13 +335,13 @@
         const bulanSorted = bulanUnik.sort((a, b) => urutanBulan.indexOf(a.substring(0,3)) - urutanBulan.indexOf(b.substring(0,3)));
 
         const selTahun = document.getElementById('selTahun');
-        const selBulan = document.getElementById('selBulan');
+        const listBulan = document.getElementById('listBulan');
         const listSales = document.getElementById('listSales');
         const listKategori = document.getElementById('listKategori');
         const datalistPelanggan = document.getElementById('pelangganList');
 
         tahunSet.forEach(t => selTahun.innerHTML += `<option value="${t}">${t}</option>`);
-        bulanSorted.forEach(b => selBulan.innerHTML += `<option value="${b}">${b}</option>`);
+        bulanSorted.forEach(b => { listBulan.innerHTML += `<label class="checkbox-item"><input type="checkbox" name="bulan" value="${b}" checked onclick="onCheckChange('bulan')"> ${b}</label>`; });
         salesSet.forEach(s => { listSales.innerHTML += `<label class="checkbox-item"><input type="checkbox" name="sales" value="${s}" checked onclick="onCheckChange('sales')"> ${s}</label>`; });
         kategoriSet.forEach(k => { listKategori.innerHTML += `<label class="checkbox-item"><input type="checkbox" name="kat" value="${k}" checked onclick="onCheckChange('kat')"> ${k}</label>`; });
         
@@ -313,8 +349,6 @@
 
         const now = new Date();
         selTahun.value = now.getFullYear();
-        const matchedBulan = bulanSorted.find(b => b.includes(urutanBulan[now.getMonth()]));
-        if (matchedBulan) selBulan.value = matchedBulan;
     }
 
     function toggleDropdown(id) {
@@ -341,6 +375,9 @@
         if(name === 'sales') {
             document.getElementById('checkAllSales').checked = (total === checked);
             document.getElementById('salesLabel').innerText = checked === total ? "Semua Sales" : (checked === 0 ? "Tidak Ada" : `${checked} Sales`);
+        } else if(name === 'bulan') {
+            document.getElementById('checkAllBulan').checked = (total === checked);
+            document.getElementById('bulanLabel').innerText = checked === total ? "Semua Bulan" : (checked === 0 ? "Tidak Ada" : `${checked} Bulan`);
         } else {
             document.getElementById('checkAllKat').checked = (total === checked);
             document.getElementById('kategoriLabel').innerText = checked === total ? "Semua Terpilih" : (checked === 0 ? "Tidak Ada" : `${checked} Terpilih`);
@@ -358,14 +395,19 @@
         renderLaporan();
     }
 
+    // Fungsi untuk toggle teks (potong vs turun ke bawah)
     function toggleText(element) {
-        element.style.whiteSpace = (element.style.whiteSpace === 'normal') ? 'nowrap' : 'normal';
+        if (element.style.whiteSpace === 'normal') {
+            element.style.whiteSpace = 'nowrap';
+        } else {
+            element.style.whiteSpace = 'normal';
+        }
     }
 
     function renderLaporan() {
         const thn = parseInt(document.getElementById('selTahun').value);
-        const bln = document.getElementById('selBulan').value;
         const searchTxt = document.getElementById('searchPelanggan').value.toLowerCase();
+        const selectedBulans = Array.from(document.querySelectorAll('input[name="bulan"]:checked')).map(cb => cb.value);
         const selectedSales = Array.from(document.querySelectorAll('input[name="sales"]:checked')).map(cb => cb.value);
         const selectedKats = Array.from(document.querySelectorAll('input[name="kat"]:checked')).map(cb => cb.value);
         
@@ -374,7 +416,7 @@
         
         let filtered = masterPenjualan.filter(d => 
             d.Tahun == thn && 
-            d.Bulan == bln && 
+            selectedBulans.includes(d.Bulan) &&
             selectedKats.includes(d.Kategori) && 
             selectedSales.includes(d.Sales)
         );
@@ -385,20 +427,25 @@
         filtered.forEach(row => {
             const pelangganName = row["Pelanggan"] || "TANPA NAMA";
             if (pelangganName.toLowerCase().includes(searchTxt)) {
-                if (!grouped[pelangganName]) grouped[pelangganName] = { sales: row["Sales"] || "-", total: 0 };
+                const key = `${pelangganName}|${row["Bulan"]}`;
+                if (!grouped[key]) grouped[key] = { sales: row["Sales"] || "-", pelanggan: pelangganName, bulan: row["Bulan"], total: 0 };
                 const val = Math.round(parseFloat(row["Jumlah (Inc)"]) || 0);
-                grouped[pelangganName].total += val;
+                grouped[key].total += val;
                 grandTotal += val;
             }
         });
 
-        let dataArray = Object.keys(grouped).map(p => ({ pelanggan: p, sales: grouped[p].sales, total: grouped[p].total }));
+        let dataArray = Object.keys(grouped).map(k => grouped[k]);
 
         if (currentSort.column !== null) {
             dataArray.sort((a, b) => {
                 let valA, valB;
                 if (currentSort.column === 0) { valA = a.sales; valB = b.sales; }
                 else if (currentSort.column === 1) { valA = a.pelanggan; valB = b.pelanggan; }
+                else if (currentSort.column === 2) { 
+                    valA = urutanBulan.indexOf(a.bulan.substring(0,3)); 
+                    valB = urutanBulan.indexOf(b.bulan.substring(0,3)); 
+                }
                 else { valA = a.total; valB = b.total; }
                 if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
                 if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
@@ -410,6 +457,7 @@
             tbody.innerHTML += `<tr>
                 <td class="text-left" style="padding-left:15px">${item.sales}</td>
                 <td class="text-left pelanggan-cell" onclick="toggleText(this)" title="Klik untuk lihat nama lengkap">${item.pelanggan}</td>
+                <td class="text-left">${item.bulan}</td>
                 <td class="text-right" style="padding-right:15px">${item.total.toLocaleString('id-ID')}</td>
             </tr>`;
         });
