@@ -25,7 +25,7 @@
         }
 
         .container {
-            width: fit-content; /* Container mengikuti lebar tabel */
+            width: fit-content; 
             min-width: 320px; max-width: 98%;
             background: #ffffff;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-radius: 12px;
@@ -53,16 +53,22 @@
             padding: 4px 8px; border: 1.2px solid var(--primary-black); border-radius: 4px;
             font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.7em;
             outline: none; background: white; height: 28px;
+            box-sizing: border-box;
+            min-width: 85px;
         }
 
-        /* --- STYLING TABEL FLEKSIBEL --- */
-        .table-wrapper { width: 100%; overflow-x: auto; border: none; }
+        .table-wrapper { 
+            width: 100%; 
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border: none; 
+        }
         
         table { 
-            width: auto; /* Tabel tidak dipaksa 100% agar lebar kolom pas dengan teks */
+            width: 100%;
             border-collapse: collapse; 
-            margin: 0 auto; /* Tengah secara horizontal */
-            white-space: nowrap; /* Teks tidak turun ke bawah (wrap) */
+            margin: 0 auto;
+            white-space: nowrap; 
         }
         
         thead th { 
@@ -102,13 +108,19 @@
         }
 
         .multiselect-container { position: relative; }
-        .multiselect-btn { display: flex; justify-content: space-between; align-items: center; cursor: pointer; min-width: 80px;}
+        .multiselect-btn { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .multiselect-content {
             display: none; position: absolute; top: 100%; left: 0; right: 0;
             background: white; border: 1.2px solid var(--primary-black); z-index: 100; max-height: 180px; overflow-y: auto;
         }
         .multiselect-content label { display: flex; align-items: center; padding: 6px 8px; font-size: 0.7em; cursor: pointer; gap: 6px; border-bottom: 1px solid #f0f0f0; }
         .show { display: block; }
+
+        @media screen and (max-width: 600px) {
+            .container { width: 100%; max-width: 100%; border-radius: 0; }
+            #capture-area { padding: 8px; width: auto; }
+            select, .multiselect-btn { min-width: 75px; }
+        }
 
         #pin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 2000; }
         .modal-content { background: #fff; padding: 20px; border-radius: 10px; width: 75%; max-width: 260px; text-align: center; }
@@ -312,24 +324,63 @@
         const filterSection = document.getElementById('filterSection');
         const btnSave = document.getElementById('btnSaveJPG');
         const overlay = document.getElementById('loader-overlay');
-        
+        const tableWrapper = document.querySelector('.table-wrapper');
+
         overlay.style.display = 'flex';
         btnSave.style.display = 'none';
         filterSection.style.display = 'none';
-        
+
+        const originalOverflow = tableWrapper.style.overflowX;
+        tableWrapper.style.overflowX = 'visible';
+
+        // Tunggu font selesai load
+        await document.fonts.ready;
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         try {
+            // Deteksi mobile dan adjust scale
+            const isMobile = window.innerWidth <= 600;
+            const scale = isMobile ? 1.5 : 2;
+            
             const canvas = await html2canvas(area, {
-                scale: 3, useCORS: true, backgroundColor: "#ffffff"
+                scale: scale,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: "#ffffff",
+                logging: false,
+                windowWidth: area.scrollWidth,
+                windowHeight: area.scrollHeight,
+                scrollY: -window.scrollY,
+                scrollX: -window.scrollX,
+                imageTimeout: 0,
+                removeContainer: true,
+                letterRendering: true,
+                onclone: (clonedDoc) => {
+                    const clonedArea = clonedDoc.getElementById('capture-area');
+                    clonedArea.style.width = area.scrollWidth + 'px';
+                    clonedArea.style.height = area.scrollHeight + 'px';
+                    
+                    // Force font rendering
+                    const allText = clonedDoc.querySelectorAll('*');
+                    allText.forEach(el => {
+                        el.style.fontFamily = "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+                    });
+                }
             });
+
             const link = document.createElement('a');
-            link.download = `Laporan_Omzet_Fit_${new Date().getTime()}.jpg`;
-            link.href = canvas.toDataURL("image/jpeg", 0.9);
+            link.download = `Laporan_Omzet_${Date.now()}.jpg`;
+            link.href = canvas.toDataURL("image/jpeg", 0.95);
             link.click();
-            setTimeout(() => { alert("Berhasil disampan ke galeri"); }, 500);
-        } catch (err) { alert("GAGAL PROSES."); }
-        finally {
+
+            setTimeout(() => alert("Berhasil disimpan ke galeri"), 400);
+        } catch (e) {
+            console.error(e);
+            alert("GAGAL PROSES: " + e.message);
+        } finally {
+            tableWrapper.style.overflowX = originalOverflow;
             btnSave.style.display = 'block';
-            filterSection.style.display = 'flex'; 
+            filterSection.style.display = 'flex';
             overlay.style.display = 'none';
         }
     }
