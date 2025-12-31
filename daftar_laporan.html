@@ -55,7 +55,7 @@
             letter-spacing: 1px;
         }
 
-        /* --- SIDEBAR (DESKTOP) & DRAWER (MOBILE) --- */
+        /* --- SIDEBAR --- */
         .sidebar {
             width: var(--sidebar-width);
             background: #fff;
@@ -86,7 +86,7 @@
             font-weight: 700; border-left: 4px solid var(--primary-black);
         }
 
-        /* --- AREA KONTEN --- */
+        /* --- CONTENT AREA --- */
         .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
         .main-content { flex-grow: 1; overflow-y: auto; padding: 25px; position: relative; }
         
@@ -104,235 +104,70 @@
         .report-header h1 { margin: 0; font-size: 1.3em; text-transform: uppercase; }
         .subtitle { font-size: 0.85em; color: #666; margin-top: 5px; }
 
-        /* FILTER & TABLE */
         .filter-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
         .filter-item { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 80px; }
         .filter-item.full-width { flex: 0 0 100%; }
         .filter-label { font-size: 0.65em; font-weight: 700; color: #888; text-transform: uppercase; }
         select, .dropdown-btn, .search-input { padding: 9px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.85em; width: 100%; box-sizing: border-box; outline: none; }
         .dropdown-btn { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .table-wrapper { 
-            overflow-x: auto; 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; 
-            margin-bottom: 10px;
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            white-space: nowrap; 
-            font-size: 0.85em; 
-        }
+
+        .table-wrapper { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; font-size: 0.85em; }
         th { background: var(--primary-black); color: #fff; padding: 12px 10px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid var(--border-color); }
         tr:nth-child(even) { background: var(--light-gray); }
-        .row-total td { 
-            background: var(--primary-black) !important; 
-            color: #fff; 
-            font-weight: 700; 
-            position: sticky; 
-            bottom: 0; 
-            z-index: 10;
-        }
+        .row-total td { background: var(--primary-black) !important; color: #fff; font-weight: 700; position: sticky; bottom: 0; z-index: 10; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
         .text-bold { font-weight: 700; }
         .text-green { color: var(--success-green); }
         .text-red { color: var(--danger-red); }
 
+        /* Dropdown & Autocomplete */
         .dropdown-content { display: none; position: absolute; background: #fff; border: 1px solid #ccc; max-height: 250px; overflow-y: auto; z-index: 100; min-width: 180px; border-radius: 6px; margin-top: 4px; right: 0; }
         .dropdown-content.show { display: block; }
         .dropdown-item { padding: 10px; display: flex; gap: 10px; align-items: center; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.85em; }
-
-        /* Autocomplete dropdown */
         .autocomplete-wrapper { position: relative; }
-        .autocomplete-list {
-            position: absolute; top: 100%; left: 0; right: 0;
-            background: #fff; border: 1px solid #ccc; border-top: none;
-            border-radius: 0 0 6px 6px; max-height: 200px; overflow-y: auto;
-            z-index: 100; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .autocomplete-item {
-            padding: 10px; cursor: pointer; font-size: 0.85em;
-        }
-        .autocomplete-item:hover, .autocomplete-item.selected {
-            background: #f0f2f5;
-        }
+        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 6px 6px; max-height: 200px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .autocomplete-item { padding: 10px; cursor: pointer; font-size: 0.85em; }
+        .autocomplete-item:hover, .autocomplete-item.selected { background: #f0f2f5; }
 
-        /* OVERLAY UNTUK MOBILE MENU */
         #menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
 
-        /* --- TAMPILAN MOBILE --- */
         @media (max-width: 768px) {
             .mobile-header { display: flex; }
-            .sidebar {
-                position: fixed; top: 0; left: 0; bottom: 0;
-                transform: translateX(-100%);
-                z-index: 1500; width: 280px;
-            }
+            .sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); z-index: 1500; width: 280px; }
             .sidebar.open { transform: translateX(0); }
             .sidebar-brand { display: block; background: #000; color: #fff; }
             .main-content { padding: 75px 10px 20px 10px; }
-
-            .report-card { 
-                padding: 15px 10px; 
-                margin: 0 0 20px 0; 
-                border-radius: 0; 
-                box-shadow: none; 
-            }
+            .report-card { padding: 15px 10px; margin: 0 0 20px 0; border-radius: 0; box-shadow: none; }
             .report-header { display: none; }
-
-            /* Responsif tabel di mobile - TIDAK wrap teks, kolom auto lebar sesuai isi */
-            table {
-                width: 100%;
-                table-layout: auto;     /* Kolom menyesuaikan lebar isi secara otomatis */
-                font-size: 0.8em;
-                white-space: nowrap;     /* Teks panjang TIDAK pindah baris */
-            }
-            th, td {
-                padding: 8px 6px;
-                overflow: hidden;        /* Potong teks jika terlalu panjang */
-                text-overflow: ellipsis; /* Tambahkan "..." jika teks kepotong */
-            }
-            th {
-                font-size: 0.75em;
-            }
-            .table-wrapper { 
-                border-radius: 0; 
-                border-left: none; 
-                border-right: none; 
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                margin-bottom: 0;
-            }
-
-            /* Baris total tetap terlihat saat scroll */
-            .row-total td {
-                position: sticky;
-                bottom: 0;
-                z-index: 20;
-                box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-            }
+            table { width: 100%; table-layout: auto; font-size: 0.8em; white-space: nowrap; }
+            th, td { padding: 8px 6px; overflow: hidden; text-overflow: ellipsis; }
+            th { font-size: 0.75em; }
+            .table-wrapper { border-radius: 0; border-left: none; border-right: none; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 0; }
+            .row-total td { position: sticky; bottom: 0; z-index: 20; box-shadow: 0 -2px 8px rgba(0,0,0,0.1); }
+            .col-cust { max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+            .col-cust.expand { white-space: normal; overflow: visible; text-overflow: clip; word-break: break-word; }
         }
 
-        /* --- SECURITY / PIN MODAL MODERN --- */
-        #pin-modal { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            z-index: 2500; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            animation: fadeInModal 0.4s ease;
-        }
-
-        .pin-box { 
-            background: #ffffff; 
-            padding: 40px 30px; 
-            border-radius: 20px; 
-            text-align: center; 
-            width: 85%; max-width: 360px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3); 
-            transform: translateY(0);
-            animation: slideUp 0.4s ease;
-        }
-
-        .pin-icon-wrapper {
-            width: 60px; height: 60px;
-            background: #f0f2f5;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px auto;
-            color: var(--primary-black);
-        }
-
-        .pin-title {
-            font-size: 1.4em; font-weight: 700; margin-bottom: 5px; color: var(--primary-black);
-        }
+        /* Login Modal & Loader */
+        #pin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2500; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); animation: fadeInModal 0.4s ease; }
+        .pin-box { background: #ffffff; padding: 40px 30px; border-radius: 20px; text-align: center; width: 85%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); transform: translateY(0); animation: slideUp 0.4s ease; }
+        .pin-icon-wrapper { width: 60px; height: 60px; background: #f0f2f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; color: var(--primary-black); }
+        .pin-title { font-size: 1.4em; font-weight: 700; margin-bottom: 5px; color: var(--primary-black); }
+        .pin-subtitle { font-size: 0.9em; color: #888; margin-bottom: 25px; }
+        .pin-input { font-size: 2em; letter-spacing: 12px; padding: 15px; width: 100%; text-align: center; margin-bottom: 20px; border: 2px solid #eee; background: #fafafa; border-radius: 12px; outline: none; transition: all 0.3s; box-sizing: border-box; font-family: monospace; }
+        .pin-input:focus { border-color: var(--primary-black); background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-login { display: block; width: 100%; padding: 14px; background: var(--primary-black); color: #fff; border-radius: 12px; border: none; font-weight: 700; font-size: 1em; cursor: pointer; transition: transform 0.2s, background 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         
-        .pin-subtitle {
-            font-size: 0.9em; color: #888; margin-bottom: 25px;
-        }
-
-        .pin-input { 
-            font-size: 2em; 
-            letter-spacing: 12px; 
-            padding: 15px; 
-            width: 100%; 
-            text-align: center; 
-            margin-bottom: 20px; 
-            border: 2px solid #eee; 
-            background: #fafafa;
-            border-radius: 12px; 
-            outline: none;
-            transition: all 0.3s;
-            box-sizing: border-box;
-            font-family: monospace;
-        }
-
-        .pin-input:focus {
-            border-color: var(--primary-black);
-            background: #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .btn-login { 
-            display: block; width: 100%; 
-            padding: 14px; 
-            background: var(--primary-black); 
-            color: #fff; 
-            border-radius: 12px; 
-            border: none; 
-            font-weight: 700; 
-            font-size: 1em;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-        }
-
-        .btn-login:active {
-            transform: scale(0.98);
-        }
-
         @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- TAMPILAN LOADER MODERN --- */
-        #loader-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2600;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(5px);
-            transition: opacity 0.3s ease;
-        }
-
-        .spinner-ring {
-            width: 60px; height: 60px;
-            border: 6px solid rgba(0, 0, 0, 0.1);
-            border-top: 6px solid var(--primary-black);
-            border-radius: 50%;
-            animation: spin 1s infinite linear;
-            margin-bottom: 15px;
-        }
-
-        .loader-percentage {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: var(--primary-black);
-            margin-bottom: 5px;
-        }
-
-        .loader-label {
-            font-size: 0.9em;
-            color: #666;
-            font-weight: 500;
-        }
-
+        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2600; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(5px); transition: opacity 0.3s ease; }
+        .spinner-ring { width: 60px; height: 60px; border: 6px solid rgba(0, 0, 0, 0.1); border-top: 6px solid var(--primary-black); border-radius: 50%; animation: spin 1s infinite linear; margin-bottom: 15px; }
+        .loader-percentage { font-size: 1.5em; font-weight: 700; color: var(--primary-black); margin-bottom: 5px; }
+        .loader-label { font-size: 0.9em; color: #666; font-weight: 500; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -353,12 +188,9 @@
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                 </svg>
             </div>
-            
             <div class="pin-title">Akses Terbatas</div>
             <div class="pin-subtitle">Silakan masukkan PIN keamanan</div>
-            
             <input type="password" id="inputPin" class="pin-input" maxlength="8" placeholder="••••••" inputmode="numeric">
-            
             <button class="btn-login" onclick="handleLogin()">MASUK DASHBOARD</button>
         </div>
     </div>
@@ -373,7 +205,7 @@
         <div class="sidebar-brand">Daftar Laporan</div>
         <div class="nav-tabs">
             <div class="nav-item active" onclick="switchTab('tab-omzet', 'Pencapaian Omzet')">Pencapaian Omzet</div>
-            <div class="nav-item" onclick="switchTab('tab-harian', 'Penjualan & Pembayaran')">Penjualan Pembayaran</div>
+            <div class="nav-item" onclick="switchTab('tab-harian', 'Penjualan Pembayaran')">Penjualan Pembayaran</div>
             <div class="nav-item" onclick="switchTab('tab-pelanggan', 'Penjualan Pelanggan')">Penjualan Pelanggan</div>
             <div class="nav-item" onclick="switchTab('tab-aging', 'Aging Piutang')">Aging Piutang</div>
         </div>
@@ -389,7 +221,15 @@
                         <div class="filter-item"><span class="filter-label">Bln</span><select id="omzet-bln" onchange="renderOmzet()"></select></div>
                         <div class="filter-item"><span class="filter-label">Kat</span><div style="position:relative;"><div class="dropdown-btn" onclick="toggleDrop('omzet-dropKat')"><span id="omzet-lblKat">Pilih...</span> ▼</div><div id="omzet-dropKat" class="dropdown-content"></div></div></div>
                     </div>
-                    <div class="table-wrapper"><table><thead><tr><th rowspan="2">Sales</th><th rowspan="2" class="text-right">Target</th><th rowspan="2" class="text-right">Real</th><th rowspan="2" class="text-center">%</th><th colspan="3" class="text-center">Kurang</th></tr><tr><th class="text-right">70%</th><th class="text-right">80%</th><th class="text-right">100%</th></tr></thead><tbody id="omzet-body"></tbody></table></div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th rowspan="2">Sales</th><th rowspan="2" class="text-right">Target</th><th rowspan="2" class="text-right">Real</th><th rowspan="2" class="text-center">%</th><th colspan="3" class="text-center">Kurang</th></tr>
+                                <tr><th class="text-right">70%</th><th class="text-right">80%</th><th class="text-right">100%</th></tr>
+                            </thead>
+                            <tbody id="omzet-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -400,7 +240,16 @@
                         <div class="filter-item"><span class="filter-label">Thn</span><select id="harian-thn" onchange="renderHarian()"></select></div>
                         <div class="filter-item"><span class="filter-label">Bln</span><select id="harian-bln" onchange="renderHarian()"></select></div>
                     </div>
-                    <div class="table-wrapper"><table><thead><tr><th rowspan="2" class="text-center">Tgl</th><th colspan="2" class="text-center">Penjualan</th><th colspan="2" class="text-center">Pembayaran</th></tr><tr><th class="text-center">BDG</th><th class="text-center">CRB</th><th class="text-center">BDG</th><th class="text-center">CRB</th></tr></thead><tbody id="harian-body"></tbody><tfoot><tr class="row-total"><td>TOTAL</td><td colspan="2" class="text-right" id="harian-tJual">0</td><td colspan="2" class="text-right" id="harian-tBayar">0</td></tr></tfoot></table></div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th rowspan="2" class="text-center">Tgl</th><th colspan="2" class="text-center">Penjualan</th><th colspan="2" class="text-center">Pembayaran</th></tr>
+                                <tr><th class="text-center">BDG</th><th class="text-center">CRB</th><th class="text-center">BDG</th><th class="text-center">CRB</th></tr>
+                            </thead>
+                            <tbody id="harian-body"></tbody>
+                            <tfoot><tr class="row-total"><td>TOTAL</td><td colspan="2" class="text-right" id="harian-tJual">0</td><td colspan="2" class="text-right" id="harian-tBayar">0</td></tr></tfoot>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -418,7 +267,20 @@
                             <div id="cust-autocomplete" class="autocomplete-list"></div>
                         </div>
                     </div>
-                    <div class="table-wrapper"><table><thead><tr><th>Sales</th><th>Pelanggan</th><th>Bln</th><th class="text-right">Jumlah</th></tr></thead><tbody id="cust-body"></tbody><tfoot><tr class="row-total"><td colspan="3" class="text-right">GRAND TOTAL</td><td class="text-right" id="cust-total">0</td></tr></tfoot></table></div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th onclick="sortCust('s')" style="cursor:pointer">Sales ↕</th>
+                                    <th onclick="sortCust('p')" style="cursor:pointer">Pelanggan ↕</th>
+                                    <th onclick="sortCust('b')" style="cursor:pointer">Bln ↕</th>
+                                    <th onclick="sortCust('v')" style="cursor:pointer" class="text-right">Jumlah ↕</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cust-body"></tbody>
+                            <tfoot><tr class="row-total"><td colspan="3" class="text-right">GRAND TOTAL</td><td class="text-right" id="cust-total">0</td></tr></tfoot>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -438,21 +300,10 @@
                     <div class="table-wrapper">
                         <table>
                             <thead>
-                                <tr>
-                                    <th>Pelanggan</th>
-                                    <th>No Faktur</th>
-                                    <th class="text-center">Tgl Faktur</th>
-                                    <th class="text-center">Umur</th>
-                                    <th class="text-right">Jumlah</th>
-                                </tr>
+                                <tr><th>Pelanggan</th><th>No Faktur</th><th class="text-center">Tgl Faktur</th><th class="text-center">Umur</th><th class="text-right">Jumlah</th></tr>
                             </thead>
                             <tbody id="aging-body"></tbody>
-                            <tfoot>
-                                <tr class="row-total">
-                                    <td colspan="4" class="text-center">TOTAL PIUTANG</td>
-                                    <td class="text-right" id="aging-total">0</td>
-                                </tr>
-                            </tfoot>
+                            <tfoot><tr class="row-total"><td colspan="4" class="text-center">TOTAL PIUTANG</td><td class="text-right" id="aging-total">0</td></tr></tfoot>
                         </table>
                     </div>
                 </div>
@@ -461,90 +312,36 @@
     </div>
 
 <script>
-    // Script tetap sama seperti versi sebelumnya (tidak ada perubahan pada JavaScript)
-    function toggleMenu() {
-        const sidebar = document.getElementById('sidebarArea');
-        const overlay = document.getElementById('menu-overlay');
-        sidebar.classList.toggle('open');
-        overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
-    }
-
-    function switchTab(id, title) {
-        document.querySelectorAll('.tab-pane, .nav-item').forEach(e => e.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        
-        const items = document.querySelectorAll('.nav-item');
-        const labels = ['Pencapaian Omzet', 'Penjualan & Pembayaran', 'Penjualan Pelanggan', 'Aging Piutang'];
-        const idx = labels.indexOf(title);
-        if(idx !== -1) items[idx].classList.add('active');
-
-        document.getElementById('mobile-title').innerText = title;
-
-        if(window.innerWidth <= 768) toggleMenu();
-    }
+    function toggleText(el) { if(window.innerWidth <= 768) el.classList.toggle('expand'); }
+    function toggleMenu() { const sidebar = document.getElementById('sidebarArea'); const overlay = document.getElementById('menu-overlay'); sidebar.classList.toggle('open'); overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none'; }
+    function switchTab(id, title) { document.querySelectorAll('.tab-pane, .nav-item').forEach(e => e.classList.remove('active')); document.getElementById(id).classList.add('active'); const items = document.querySelectorAll('.nav-item'); const labels = ['Pencapaian Omzet', 'Penjualan Pembayaran', 'Penjualan Pelanggan', 'Aging Piutang']; const idx = labels.indexOf(title); if(idx !== -1) items[idx].classList.add('active'); document.getElementById('mobile-title').innerText = title; if(window.innerWidth <= 768) toggleMenu(); }
 
     const API_URL = "https://script.google.com/macros/s/AKfycbxOkSTAB0rMkpicHZeCTdsYrmu8Qh65y52r--2m2Ju2NomE1ir2lKkZRjWtrZw7dX0n/exec";
     const DATA_STORE = { jual: [], bayar: [], target: [], aging: [], pin: "" };
     const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-    let custNames = [];
-    let agingNames = [];
+    let custNames = [], agingNames = [];
+    
+    // VARIABEL GLOBAL UNTUK SORTIR PELANGGAN
+    let custSortCol = 's'; 
+    let custSortDir = 1;
 
     async function handleLogin() {
         const pinInput = document.getElementById('inputPin').value;
         const loader = document.getElementById('loader-overlay');
         const pctText = document.getElementById('load-percent');
-        
-        loader.style.display = 'flex';
-        document.getElementById('pin-modal').style.display = 'none';
-        
-        let progress = 0;
-        pctText.innerText = "0%";
-        const timer = setInterval(() => {
-            if (progress < 90) { 
-                progress += Math.floor(Math.random() * 5) + 1; 
-                if(progress > 90) progress = 90;
-                pctText.innerText = progress + "%";
-            }
-        }, 100);
-
+        loader.style.display = 'flex'; document.getElementById('pin-modal').style.display = 'none';
+        let progress = 0; pctText.innerText = "0%";
+        const timer = setInterval(() => { if (progress < 90) { progress += Math.floor(Math.random() * 5) + 1; if(progress > 90) progress = 90; pctText.innerText = progress + "%"; } }, 100);
         try {
-            const resp = await fetch(API_URL);
-            const raw = await resp.json();
-            
-            if (pinInput !== String(raw.pin)) { 
-                clearInterval(timer);
-                alert("PIN SALAH!"); 
-                location.reload(); 
-                return; 
-            }
-
-            DATA_STORE.jual = raw.penjualan; 
-            DATA_STORE.bayar = raw.pembayaran; 
-            DATA_STORE.target = raw.target; 
-            DATA_STORE.aging = raw.aging;
-            
+            const resp = await fetch(API_URL); const raw = await resp.json();
+            if (pinInput !== String(raw.pin)) { clearInterval(timer); alert("PIN SALAH!"); location.reload(); return; }
+            DATA_STORE.jual = raw.penjualan; DATA_STORE.bayar = raw.pembayaran; DATA_STORE.target = raw.target; DATA_STORE.aging = raw.aging;
             custNames = [...new Set(DATA_STORE.jual.map(d => d.Pelanggan).filter(Boolean))].sort((a,b) => a.localeCompare(b));
             agingNames = [...new Set(DATA_STORE.aging.map(d => d.PELANGGAN).filter(Boolean))].sort((a,b) => a.localeCompare(b));
-
-            initAll();
-
-            clearInterval(timer);
-            pctText.innerText = "100%";
-            
-            setTimeout(() => {
-                loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    document.getElementById('mainWrapper').style.display = 'flex';
-                }, 300);
-            }, 500);
-
-        } catch (e) { 
-            clearInterval(timer);
-            alert("Gagal: " + e.message); 
-            location.reload(); 
-        }
+            initAll(); clearInterval(timer); pctText.innerText = "100%";
+            setTimeout(() => { loader.style.opacity = '0'; setTimeout(() => { loader.style.display = 'none'; document.getElementById('mainWrapper').style.display = 'flex'; }, 300); }, 500);
+        } catch (e) { clearInterval(timer); alert("Gagal: " + e.message); location.reload(); }
     }
 
     function initAll() { initOmzet(); initHarian(); initCust(); initAging(); }
@@ -553,32 +350,20 @@
         const yrs = [...new Set(DATA_STORE.jual.map(d => d.Tahun))].sort((a,b)=>b-a);
         const blns = [...new Set(DATA_STORE.jual.map(d => d.Bulan))].sort((a,b) => MONTHS.findIndex(m=>a.includes(m)) - MONTHS.findIndex(m=>b.includes(m)));
         const kats = [...new Set(DATA_STORE.jual.map(d => d.Kategori))].sort();
-        fillSel('omzet-thn', yrs); fillSel('omzet-bln', blns);
-        populateCheck('omzet-dropKat', kats, 'chk-o-kat', renderOmzet, ["DISTRIBUSI"]);
+        fillSel('omzet-thn', yrs); fillSel('omzet-bln', blns); populateCheck('omzet-dropKat', kats, 'chk-o-kat', renderOmzet, ["DISTRIBUSI"]);
         setDef('omzet-thn', 'omzet-bln', blns); renderOmzet();
     }
-
     function renderOmzet() {
-        const thn = document.getElementById('omzet-thn').value;
-        const bln = document.getElementById('omzet-bln').value;
-        const kats = getChecks('chk-o-kat');
+        const thn = document.getElementById('omzet-thn').value, bln = document.getElementById('omzet-bln').value, kats = getChecks('chk-o-kat');
         document.getElementById('omzet-lblKat').innerText = kats.length ? kats.length + " Kat" : "Semua";
         document.getElementById('omzet-sub').innerText = `${bln} ${thn}`;
-        const realMap = {};
-        DATA_STORE.jual.filter(d => d.Tahun == thn && d.Bulan == bln && (kats.length===0 || kats.includes(d.Kategori)))
-            .forEach(d => realMap[d.Sales] = (realMap[d.Sales]||0) + (parseFloat(d["Jumlah (Inc)"])||0));
-        const groups = {};
-        DATA_STORE.target.forEach(t => { if(!groups[t.Spv]) groups[t.Spv] = []; groups[t.Spv].push({ name: t.Sales, tgt: parseFloat(t.Target)||0 }); });
+        const realMap = {}; DATA_STORE.jual.filter(d => d.Tahun == thn && d.Bulan == bln && (kats.length===0 || kats.includes(d.Kategori))).forEach(d => realMap[d.Sales] = (realMap[d.Sales]||0) + (parseFloat(d["Jumlah (Inc)"])||0));
+        const groups = {}; DATA_STORE.target.forEach(t => { if(!groups[t.Spv]) groups[t.Spv] = []; groups[t.Spv].push({ name: t.Sales, tgt: parseFloat(t.Target)||0 }); });
         let html = "";
         Object.keys(groups).forEach(spv => {
-            let sT = 0, sR = 0; let rows = "";
-            groups[spv].forEach(s => {
-                const r = realMap[s.name] || 0; sT += s.tgt; sR += r;
-                const p = s.tgt > 0 ? Math.round((r/s.tgt)*100) : 0;
-                rows += `<tr><td>${s.name}</td><td class="text-right">${fmt(s.tgt)}</td><td class="text-right">${fmt(r)}</td><td class="text-center text-bold ${p>=70?'text-green':''}">${p}%</td><td class="text-right">${df(s.tgt*0.7-r)}</td><td class="text-right">${df(s.tgt*0.8-r)}</td><td class="text-right">${df(s.tgt-r)}</td></tr>`;
-            });
-            const pS = sT > 0 ? Math.round(sR/sT*100) : 0;
-            html += rows + `<tr class="row-total"><td>${spv}</td><td class="text-right">${fmt(sT)}</td><td class="text-right">${fmt(sR)}</td><td class="text-center">${pS}%</td><td class="text-right">${df(sT*0.7-sR)}</td><td class="text-right">${df(sT*0.8-sR)}</td><td class="text-right">${df(sT-sR)}</td></tr>`;
+            let sT = 0, sR = 0, rows = "";
+            groups[spv].forEach(s => { const r = realMap[s.name] || 0; sT += s.tgt; sR += r; const p = s.tgt > 0 ? Math.round((r/s.tgt)*100) : 0; rows += `<tr><td>${s.name}</td><td class="text-right">${fmt(s.tgt)}</td><td class="text-right">${fmt(r)}</td><td class="text-center text-bold ${p>=70?'text-green':''}">${p}%</td><td class="text-right">${df(s.tgt*0.7-r)}</td><td class="text-right">${df(s.tgt*0.8-r)}</td><td class="text-right">${df(s.tgt-r)}</td></tr>`; });
+            const pS = sT > 0 ? Math.round(sR/sT*100) : 0; html += rows + `<tr class="row-total"><td>${spv}</td><td class="text-right">${fmt(sT)}</td><td class="text-right">${fmt(sR)}</td><td class="text-center">${pS}%</td><td class="text-right">${df(sT*0.7-sR)}</td><td class="text-right">${df(sT*0.8-sR)}</td><td class="text-right">${df(sT-sR)}</td></tr>`;
         });
         document.getElementById('omzet-body').innerHTML = html;
     }
@@ -586,33 +371,27 @@
     function initHarian() {
         const yrs = [...new Set(DATA_STORE.jual.map(d => d.Tahun))].sort((a,b)=>b-a);
         const blns = [...new Set(DATA_STORE.jual.map(d => d.Bulan))].sort((a,b) => MONTHS.findIndex(m=>a.includes(m)) - MONTHS.findIndex(m=>b.includes(m)));
-        fillSel('harian-thn', yrs); fillSel('harian-bln', blns);
-        setDef('harian-thn', 'harian-bln', blns); renderHarian();
+        fillSel('harian-thn', yrs); fillSel('harian-bln', blns); setDef('harian-thn', 'harian-bln', blns); renderHarian();
+    }
+    function renderHarian() {
+        const thn = document.getElementById('harian-thn').value, bln = document.getElementById('harian-bln').value;
+        document.getElementById('harian-sub').innerText = `${bln} ${thn}`;
+        const map = {}; DATA_STORE.jual.filter(d => d.Tahun == thn && d.Bulan == bln).forEach(d => { const k = new Date(d["Tgl Faktur"]).toDateString(); if(!map[k]) map[k] = { jB:0, jC:0, bB:0, bC:0 }; if(d.Gudang === "BANDUNG") map[k].jB += (parseFloat(d["Jumlah (Inc)"])||0); else map[k].jC += (parseFloat(d["Jumlah (Inc)"])||0); });
+        DATA_STORE.bayar.filter(d => d.Tahun == thn && d.Bulan == bln).forEach(d => { const k = new Date(d["Tanggal"]).toDateString(); if(!map[k]) map[k] = { jB:0, jC:0, bB:0, bC:0 }; if(d.Gudang === "BANDUNG") map[k].bB += (parseFloat(d["Jumlah Bayar"])||0); else map[k].bC += (parseFloat(d["Jumlah Bayar"])||0); });
+        let h = "", tJ = 0, tB = 0;
+        Object.keys(map).sort((a,b)=>new Date(a)-new Date(b)).forEach(k => { const d = map[k], dt = new Date(k); tJ += (d.jB+d.jC); tB += (d.bB+d.bC); h += `<tr><td class="text-center">${dt.getDate()}-${MONTHS[dt.getMonth()]}</td><td class="text-right">${fmt(d.jB)}</td><td class="text-right">${fmt(d.jC)}</td><td class="text-right text-green">${fmt(d.bB)}</td><td class="text-right text-green">${fmt(d.bC)}</td></tr>`; });
+        document.getElementById('harian-body').innerHTML = h; document.getElementById('harian-tJual').innerText = fmt(tJ); document.getElementById('harian-tBayar').innerText = fmt(tB);
     }
 
-    function renderHarian() {
-        const thn = document.getElementById('harian-thn').value;
-        const bln = document.getElementById('harian-bln').value;
-        document.getElementById('harian-sub').innerText = `${bln} ${thn}`;
-        const map = {};
-        DATA_STORE.jual.filter(d => d.Tahun == thn && d.Bulan == bln).forEach(d => {
-            const k = new Date(d["Tgl Faktur"]).toDateString();
-            if(!map[k]) map[k] = { jB:0, jC:0, bB:0, bC:0 };
-            if(d.Gudang === "BANDUNG") map[k].jB += (parseFloat(d["Jumlah (Inc)"])||0); else map[k].jC += (parseFloat(d["Jumlah (Inc)"])||0);
-        });
-        DATA_STORE.bayar.filter(d => d.Tahun == thn && d.Bulan == bln).forEach(d => {
-            const k = new Date(d["Tanggal"]).toDateString();
-            if(!map[k]) map[k] = { jB:0, jC:0, bB:0, bC:0 };
-            if(d.Gudang === "BANDUNG") map[k].bB += (parseFloat(d["Jumlah Bayar"])||0); else map[k].bC += (parseFloat(d["Jumlah Bayar"])||0);
-        });
-        let h = "", tJ = 0, tB = 0;
-        Object.keys(map).sort((a,b)=>new Date(a)-new Date(b)).forEach(k => {
-            const d = map[k], dt = new Date(k); tJ += (d.jB+d.jC); tB += (d.bB+d.bC);
-            h += `<tr><td class="text-center">${dt.getDate()}-${MONTHS[dt.getMonth()]}</td><td class="text-right">${fmt(d.jB)}</td><td class="text-right">${fmt(d.jC)}</td><td class="text-right text-green">${fmt(d.bB)}</td><td class="text-right text-green">${fmt(d.bC)}</td></tr>`;
-        });
-        document.getElementById('harian-body').innerHTML = h;
-        document.getElementById('harian-tJual').innerText = fmt(tJ);
-        document.getElementById('harian-tBayar').innerText = fmt(tB);
+    // FUNGSI SORTIR PELANGGAN
+    function sortCust(col) {
+        if (custSortCol === col) {
+            custSortDir *= -1;
+        } else {
+            custSortCol = col;
+            custSortDir = 1;
+        }
+        renderCust();
     }
 
     function initCust() {
@@ -620,116 +399,66 @@
         const sls = [...new Set(DATA_STORE.jual.map(d => d.Sales))].sort();
         const blns = [...new Set(DATA_STORE.jual.map(d => d.Bulan))].sort((a,b) => MONTHS.findIndex(m=>a.includes(m)) - MONTHS.findIndex(m=>b.includes(m)));
         fillSel('cust-thn', yrs); populateCheck('cust-dropSales', sls, 'chk-c-sls', renderCust); populateCheck('cust-dropBln', blns, 'chk-c-bln', renderCust);
-        document.getElementById('cust-thn').value = new Date().getFullYear(); 
+        document.getElementById('cust-thn').value = new Date().getFullYear();
         document.getElementById('cust-search').addEventListener('input', () => showAutocomplete('cust', document.getElementById('cust-search').value));
         document.getElementById('cust-search').addEventListener('focus', () => showAutocomplete('cust', document.getElementById('cust-search').value));
         renderCust();
     }
-
     function renderCust() {
-        const thn = document.getElementById('cust-thn').value;
-        const s = document.getElementById('cust-search').value.toLowerCase();
-        const sls = getChecks('chk-c-sls'); const blns = getChecks('chk-c-bln');
+        const thn = document.getElementById('cust-thn').value, s = document.getElementById('cust-search').value.toLowerCase(), sls = getChecks('chk-c-sls'), blns = getChecks('chk-c-bln');
         document.getElementById('cust-lblSales').innerText = sls.length ? sls.length + " Sales" : "Semua";
         document.getElementById('cust-lblBln').innerText = blns.length ? blns.length + " Bln" : "Semua";
         const filtered = DATA_STORE.jual.filter(d => d.Tahun == thn && (sls.length === 0 || sls.includes(d.Sales)) && (blns.length === 0 || blns.includes(d.Bulan)) && (d.Pelanggan && d.Pelanggan.toLowerCase().includes(s)));
         const group = {}; let grand = 0;
-        filtered.forEach(d => {
-            const k = d.Pelanggan + d.Bulan; if(!group[k]) group[k] = { s: d.Sales, p: d.Pelanggan, b: d.Bulan, v: 0 };
-            const v = parseFloat(d["Jumlah (Inc)"])||0; group[k].v += v; grand += v;
+        filtered.forEach(d => { const k = d.Pelanggan + d.Bulan; if(!group[k]) group[k] = { s: d.Sales, p: d.Pelanggan, b: d.Bulan, v: 0 }; const v = parseFloat(d["Jumlah (Inc)"])||0; group[k].v += v; grand += v; });
+        const arr = Object.values(group);
+        
+        // LOGIKA SORTIR DINAMIS
+        arr.sort((a, b) => {
+            let valA = a[custSortCol];
+            let valB = b[custSortCol];
+            if (custSortCol === 'v') {
+                return (valA - valB) * custSortDir;
+            } else if (custSortCol === 'b') {
+                return (MONTHS.indexOf(valA.substring(0,3)) - MONTHS.indexOf(valB.substring(0,3))) * custSortDir;
+            } else {
+                return valA.localeCompare(valB) * custSortDir;
+            }
         });
-        const arr = Object.values(group).sort((a,b) => b.v - a.v);
-        document.getElementById('cust-body').innerHTML = arr.map(i => `<tr><td>${i.s}</td><td>${i.p}</td><td>${i.b}</td><td class="text-right">${fmt(i.v)}</td></tr>`).join('');
+
+        document.getElementById('cust-body').innerHTML = arr.map(i => `<tr><td>${i.s}</td><td class="col-cust" onclick="toggleText(this)">${i.p}</td><td>${i.b}</td><td class="text-right">${fmt(i.v)}</td></tr>`).join('');
         document.getElementById('cust-total').innerText = fmt(grand);
     }
 
     function initAging() {
         const sls = [...new Set(DATA_STORE.aging.map(d => d.SALES))].sort();
         const customOrder = ["1-30", "31-60", "61-90", "91-120", "121-150", ">150"];
-        populateCheck('aging-dropSales', sls, 'chk-a-sls', renderAging);
-        populateCheck('aging-dropUmur', customOrder, 'chk-a-grp', renderAging); 
+        populateCheck('aging-dropSales', sls, 'chk-a-sls', renderAging); populateCheck('aging-dropUmur', customOrder, 'chk-a-grp', renderAging); 
         document.getElementById('aging-search').addEventListener('input', () => showAutocomplete('aging', document.getElementById('aging-search').value));
         document.getElementById('aging-search').addEventListener('focus', () => showAutocomplete('aging', document.getElementById('aging-search').value));
         renderAging();
     }
-
     function renderAging() {
-        const s = document.getElementById('aging-search').value.toLowerCase();
-        const sls = getChecks('chk-a-sls'); const grps = getChecks('chk-a-grp');
+        const s = document.getElementById('aging-search').value.toLowerCase(), sls = getChecks('chk-a-sls'), grps = getChecks('chk-a-grp');
         document.getElementById('aging-lblSales').innerText = sls.length ? sls.length + " Sales" : "Semua";
         document.getElementById('aging-lblUmur').innerText = grps.length ? grps.length + " Grup" : "Semua";
-        let filtered = DATA_STORE.aging.filter(d => 
-            (sls.length === 0 || sls.includes(d.SALES)) && 
-            (grps.length === 0 || grps.includes(d["UMUR GRUP"])) && 
-            (d.PELANGGAN && d.PELANGGAN.toLowerCase().includes(s))
-        );
-
-        filtered.sort((a, b) => {
-            if (a.PELANGGAN !== b.PELANGGAN) {
-                return a.PELANGGAN.localeCompare(b.PELANGGAN);
-            }
-            return parseInt(b.UMUR) - parseInt(a.UMUR);
-        });
-
+        let filtered = DATA_STORE.aging.filter(d => (sls.length === 0 || sls.includes(d.SALES)) && (grps.length === 0 || grps.includes(d["UMUR GRUP"])) && (d.PELANGGAN && d.PELANGGAN.toLowerCase().includes(s)));
+        filtered.sort((a, b) => { if (a.PELANGGAN !== b.PELANGGAN) return a.PELANGGAN.localeCompare(b.PELANGGAN); return parseInt(b.UMUR) - parseInt(a.UMUR); });
         let h = "", total = 0;
-        filtered.forEach(d => { 
-            const v = parseFloat(d.JUMLAH)||0; 
-            total += v; 
-            const u = parseInt(d.UMUR)||0; 
-            const noFaktur = d["NO FAKTUR"] || "-";
-            h += `<tr>
-                <td>${d.PELANGGAN}</td>
-                <td>${noFaktur}</td>
-                <td class="text-center">${fd(d["TGL FAKTUR"])}</td>
-                <td class="text-center ${u>=120?'text-red text-bold':''}">${u}</td>
-                <td class="text-right">${fmt(v)}</td>
-            </tr>`; 
-        });
-        document.getElementById('aging-body').innerHTML = h;
-        document.getElementById('aging-total').innerText = fmt(total);
+        filtered.forEach(d => { const v = parseFloat(d.JUMLAH)||0; total += v; const u = parseInt(d.UMUR)||0; h += `<tr><td class="col-cust" onclick="toggleText(this)">${d.PELANGGAN}</td><td>${d["NO FAKTUR"]||"-"}</td><td class="text-center">${fd(d["TGL FAKTUR"])}</td><td class="text-center ${u>=120?'text-red text-bold':''}">${u}</td><td class="text-right">${fmt(v)}</td></tr>`; });
+        document.getElementById('aging-body').innerHTML = h; document.getElementById('aging-total').innerText = fmt(total);
     }
 
     function showAutocomplete(type, query) {
-        const listId = type === 'cust' ? 'cust-autocomplete' : 'aging-autocomplete';
-        const names = type === 'cust' ? custNames : agingNames;
-        const listEl = document.getElementById(listId);
-        listEl.innerHTML = '';
-
-        if (!query.trim()) {
-            listEl.style.display = 'none';
-            return;
-        }
-
+        const listId = type === 'cust' ? 'cust-autocomplete' : 'aging-autocomplete', names = type === 'cust' ? custNames : agingNames, listEl = document.getElementById(listId);
+        listEl.innerHTML = ''; if (!query.trim()) { listEl.style.display = 'none'; return; }
         const matches = names.filter(n => n.toLowerCase().includes(query.toLowerCase())).slice(0, 10);
-        if (matches.length === 0) {
-            listEl.style.display = 'none';
-            return;
-        }
-
-        matches.forEach(name => {
-            const item = document.createElement('div');
-            item.className = 'autocomplete-item';
-            item.textContent = name;
-            item.onclick = () => {
-                if (type === 'cust') document.getElementById('cust-search').value = name;
-                else document.getElementById('aging-search').value = name;
-                listEl.style.display = 'none';
-                if (type === 'cust') renderCust();
-                else renderAging();
-            };
-            listEl.appendChild(item);
-        });
-
+        if (matches.length === 0) { listEl.style.display = 'none'; return; }
+        matches.forEach(name => { const item = document.createElement('div'); item.className = 'autocomplete-item'; item.textContent = name; item.onclick = () => { if (type === 'cust') { document.getElementById('cust-search').value = name; renderCust(); } else { document.getElementById('aging-search').value = name; renderAging(); } listEl.style.display = 'none'; }; listEl.appendChild(item); });
         listEl.style.display = 'block';
     }
 
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.autocomplete-wrapper')) {
-            document.getElementById('cust-autocomplete').style.display = 'none';
-            document.getElementById('aging-autocomplete').style.display = 'none';
-        }
-    });
-
+    document.addEventListener('click', (e) => { if (!e.target.closest('.autocomplete-wrapper')) { document.getElementById('cust-autocomplete').style.display = 'none'; document.getElementById('aging-autocomplete').style.display = 'none'; } });
     function fmt(n) { return Math.round(n||0).toLocaleString('id-ID'); }
     function df(n) { return n > 0 ? fmt(n) : '-'; }
     function fd(s) { if(!s || s === "(blank)") return "-"; const d = new Date(s); return isNaN(d) ? s : `${d.getDate()}-${MONTHS[d.getMonth()]}-${d.getFullYear().toString().substr(-2)}`; }
