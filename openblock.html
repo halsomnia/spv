@@ -12,14 +12,15 @@
         .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
         .logo img { height: 50px; width: auto; display: block; }
         .doc-info { text-align: right; font-size: 14px; font-weight: bold; }
-        h1 { text-align: center; font-size: 18px; margin-top: 5px; margin-bottom: 30px; }
+        h1 { text-align: center; font-size: 25px; margin-top: 5px; margin-bottom: 30px; }
         .info-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
         .info-row { display: flex; align-items: center; }
         .info-section label { width: 180px; font-weight: normal; white-space: nowrap; flex-shrink: 0; }
         .info-section .separator { margin: 0 10px; width: 10px; text-align: center; flex-shrink: 0; }
         .info-section select, .info-section input { flex-grow: 1; padding: 4px; border: 1px solid #ccc; font-family: 'DM Sans', sans-serif; transition: border-color 0.3s; }
         .piutang-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 30px; }
-        .piutang-table th, .piutang-table td { border: 1px solid #000; padding: 8px 10px; text-align: center; font-size: 13px; height: 25px; }
+        /* Padding dan height dikurangi agar lebih padat */
+        .piutang-table th, .piutang-table td { border: 1px solid #000; padding: 4px 10px; text-align: center; font-size: 13px; height: 20px; }
         .piutang-table th { background-color: #e0e0e0; font-weight: bold; }
         .piutang-table .total-row td { font-weight: bold; text-align: center; background-color: #e0e0e0; padding: 8px 10px; }
         .data-nominal { text-align: right !important; }
@@ -97,7 +98,8 @@
                 <tr><td></td><td></td><td>31-60</td><td id="nominal-31-60" class="data-nominal"></td><td></td><td></td><td></td></tr>
                 <tr><td></td><td></td><td>61-90</td><td id="nominal-61-90" class="data-nominal"></td><td></td><td></td><td></td></tr>
                 <tr><td></td><td></td><td>91-120</td><td id="nominal-91-120" class="data-nominal"></td><td></td><td></td><td></td></tr>
-                <tr><td></td><td></td><td>>120</td><td id="nominal-over-120" class="data-nominal"></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td>121-150</td><td id="nominal-121-150" class="data-nominal"></td><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td>>150</td><td id="nominal-over-150" class="data-nominal"></td><td></td><td></td><td></td></tr>
             </tbody>
             <tfoot>
                 <tr class="total-row">
@@ -131,9 +133,7 @@
     <datalist id="daftarPelanggan"></datalist>
 
     <script>
-        // --- PERBAIKAN: GANTI CSV KE GOOGLE SHEETS ---
         const scriptURL = 'https://script.google.com/macros/s/AKfycbz0skgU0I9-R9THHIAFNpXVdBeOE1XWBbHheParlyknT9XlZUnS_AlxOYXGe-nZ6lngmw/exec'; 
-        // --------------------------------------------
 
         const inputPelanggan = document.getElementById('namaPelangganInput');
         const noPelangganInput = document.getElementById('noPelanggan');
@@ -261,13 +261,11 @@
             });
         }
 
-        // --- PERBAIKAN: FUNGSI LOAD DATA DARI GOOGLE SHEETS ---
         async function loadPiutangData() {
             try {
                 const response = await fetch(scriptURL);
                 const data = await response.json();
                 
-                // Lewati baris header (index 0)
                 const rows = data.slice(1); 
                 const uniqueNames = new Set();
 
@@ -311,13 +309,13 @@
         });
 
         function updatePiutangTable(nama) {
-            const ids = ['nominal-1-30', 'nominal-31-60', 'nominal-61-90', 'nominal-91-120', 'nominal-over-120'];
+            const ids = ['nominal-1-30', 'nominal-31-60', 'nominal-61-90', 'nominal-91-120', 'nominal-121-150', 'nominal-over-150'];
             ids.forEach(id => document.getElementById(id).textContent = '');
             document.getElementById('totalNominal').textContent = '-';
             if (!nama) return;
             
             const filtered = allPiutangData.filter(item => item.nama === nama);
-            const cat = { '1-30': 0, '31-60': 0, '61-90': 0, '91-120': 0, '>120': 0 };
+            const cat = { '1-30': 0, '31-60': 0, '61-90': 0, '91-120': 0, '121-150': 0, '>150': 0 };
             let total = 0;
 
             filtered.forEach(item => {
@@ -328,14 +326,16 @@
                 else if (age === '31-60' || age === '30-60') cat['31-60'] += item.nominal;
                 else if (age === '61-90') cat['61-90'] += item.nominal;
                 else if (age === '91-120') cat['91-120'] += item.nominal;
-                else if (age === '>120') cat['>120'] += item.nominal;
+                else if (age === '121-150') cat['121-150'] += item.nominal;
+                else if (age === '>150' || age === '>120') cat['>150'] += item.nominal;
             });
 
             document.getElementById('nominal-1-30').textContent = formatRupiah(cat['1-30']);
             document.getElementById('nominal-31-60').textContent = formatRupiah(cat['31-60']);
             document.getElementById('nominal-61-90').textContent = formatRupiah(cat['61-90']);
             document.getElementById('nominal-91-120').textContent = formatRupiah(cat['91-120']);
-            document.getElementById('nominal-over-120').textContent = formatRupiah(cat['>120']);
+            document.getElementById('nominal-121-150').textContent = formatRupiah(cat['121-150']);
+            document.getElementById('nominal-over-150').textContent = formatRupiah(cat['>150']);
             document.getElementById('totalNominal').textContent = formatRupiah(total);
         }
 
