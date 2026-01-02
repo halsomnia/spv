@@ -25,7 +25,7 @@
             display: flex; height: 100vh; overflow: hidden;
         }
 
-        /* --- HEADER MOBILE (Hanya Muncul di Mobile) --- */
+        /* --- HEADER MOBILE --- */
         .mobile-header {
             display: none;
             background: var(--primary-black);
@@ -123,7 +123,6 @@
         .text-green { color: var(--success-green); }
         .text-red { color: var(--danger-red); }
 
-        /* Dropdown & Autocomplete */
         .dropdown-content { display: none; position: absolute; background: #fff; border: 1px solid #ccc; max-height: 250px; overflow-y: auto; z-index: 100; min-width: 180px; border-radius: 6px; margin-top: 4px; right: 0; }
         .dropdown-content.show { display: block; }
         .dropdown-item { padding: 10px; display: flex; gap: 10px; align-items: center; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.85em; }
@@ -146,28 +145,15 @@
             th, td { padding: 8px 6px; overflow: hidden; text-overflow: ellipsis; }
             th { font-size: 0.75em; }
             .table-wrapper { border-radius: 0; border-left: none; border-right: none; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 0; }
-            .row-total td { position: sticky; bottom: 0; z-index: 20; box-shadow: 0 -2px 8px rgba(0,0,0,0.1); }
-            .col-cust { max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
-            .col-cust.expand { white-space: normal; overflow: visible; text-overflow: clip; word-break: break-word; }
         }
 
-        /* Login Modal & Loader */
-        #pin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2500; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); animation: fadeInModal 0.4s ease; }
-        .pin-box { background: #ffffff; padding: 40px 30px; border-radius: 20px; text-align: center; width: 85%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); transform: translateY(0); animation: slideUp 0.4s ease; }
-        .pin-icon-wrapper { width: 60px; height: 60px; background: #f0f2f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; color: var(--primary-black); }
-        .pin-title { font-size: 1.4em; font-weight: 700; margin-bottom: 5px; color: var(--primary-black); }
-        .pin-subtitle { font-size: 0.9em; color: #888; margin-bottom: 25px; }
-        .pin-input { font-size: 2em; letter-spacing: 12px; padding: 15px; width: 100%; text-align: center; margin-bottom: 20px; border: 2px solid #eee; background: #fafafa; border-radius: 12px; outline: none; transition: all 0.3s; box-sizing: border-box; font-family: monospace; }
-        .pin-input:focus { border-color: var(--primary-black); background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .btn-login { display: block; width: 100%; padding: 14px; background: var(--primary-black); color: #fff; border-radius: 12px; border: none; font-weight: 700; font-size: 1em; cursor: pointer; transition: transform 0.2s, background 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        #pin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2500; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); }
+        .pin-box { background: #ffffff; padding: 40px 30px; border-radius: 20px; text-align: center; width: 85%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .pin-input { font-size: 2em; letter-spacing: 12px; padding: 15px; width: 100%; text-align: center; margin-bottom: 20px; border: 2px solid #eee; background: #fafafa; border-radius: 12px; outline: none; box-sizing: border-box; }
+        .btn-login { display: block; width: 100%; padding: 14px; background: var(--primary-black); color: #fff; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; }
         
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
-
-        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2600; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(5px); transition: opacity 0.3s ease; }
+        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2600; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(255, 255, 255, 0.92); }
         .spinner-ring { width: 60px; height: 60px; border: 6px solid rgba(0, 0, 0, 0.1); border-top: 6px solid var(--primary-black); border-radius: 50%; animation: spin 1s infinite linear; margin-bottom: 15px; }
-        .loader-percentage { font-size: 1.5em; font-weight: 700; color: var(--primary-black); margin-bottom: 5px; }
-        .loader-label { font-size: 0.9em; color: #666; font-weight: 500; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -182,14 +168,7 @@
 
     <div id="pin-modal">
         <div class="pin-box">
-            <div class="pin-icon-wrapper">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-            </div>
-            <div class="pin-title">Akses Terbatas</div>
-            <div class="pin-subtitle">Silakan masukkan PIN keamanan</div>
+            <div class="pin-title" style="font-weight:700; font-size:1.4em; margin-bottom:20px;">Akses Terbatas</div>
             <input type="password" id="inputPin" class="pin-input" maxlength="8" placeholder="••••••" inputmode="numeric">
             <button class="btn-login" onclick="handleLogin()">MASUK DASHBOARD</button>
         </div>
@@ -197,8 +176,8 @@
 
     <div id="loader-overlay" style="display:none;">
         <div class="spinner-ring"></div>
-        <div class="loader-percentage" id="load-percent">0%</div>
-        <div class="loader-label">Menghubungkan ke Server...</div>
+        <div id="load-percent" style="font-weight:700; font-size:1.5em;">0%</div>
+        <div style="color:#666;">Menghubungkan ke Server...</div>
     </div>
 
     <div class="sidebar" id="sidebarArea">
@@ -212,7 +191,7 @@
     </div>
 
     <div class="main-wrapper" id="mainWrapper" style="display:none;">
-        <div class="main-content">
+        <div class="main-content" id="mainScrollContent">
             <div id="tab-omzet" class="tab-pane active">
                 <div class="report-card">
                     <div class="report-header"><h1>Pencapaian Omzet</h1><div class="subtitle" id="omzet-sub"></div></div>
@@ -257,7 +236,7 @@
                 <div class="report-card">
                     <div class="report-header"><h1>Penjualan Per Pelanggan</h1></div>
                     <div class="filter-group">
-                        <div class="filter-item"><span class="filter-label">Thn</span><select id="cust-thn" onchange="renderCust()"></select></div>
+                        <div class="filter-item"><span class="filter-label">Thn</span><select id="cust-thn" onchange="resetAndRender('cust')"></select></div>
                         <div class="filter-item"><span class="filter-label">Sls</span><div style="position:relative;"><div class="dropdown-btn" onclick="toggleDrop('cust-dropSales')"><span id="cust-lblSales">Semua</span> ▼</div><div id="cust-dropSales" class="dropdown-content"></div></div></div>
                         <div class="filter-item"><span class="filter-label">Bln</span><div style="position:relative;"><div class="dropdown-btn" onclick="toggleDrop('cust-dropBln')"><span id="cust-lblBln">Semua</span> ▼</div><div id="cust-dropBln" class="dropdown-content"></div></div></div>
                     </div>
@@ -312,6 +291,11 @@
     </div>
 
 <script>
+    // VARIABEL UNTUK INFINITE SCROLL
+    let limitCust = 50;
+    let limitAging = 50;
+    const gapLoad = 50;
+
     function toggleText(el) { if(window.innerWidth <= 768) el.classList.toggle('expand'); }
     function toggleMenu() { const sidebar = document.getElementById('sidebarArea'); const overlay = document.getElementById('menu-overlay'); sidebar.classList.toggle('open'); overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none'; }
     function switchTab(id, title) { document.querySelectorAll('.tab-pane, .nav-item').forEach(e => e.classList.remove('active')); document.getElementById(id).classList.add('active'); const items = document.querySelectorAll('.nav-item'); const labels = ['Pencapaian Omzet', 'Penjualan Pembayaran', 'Penjualan Pelanggan', 'Aging Piutang']; const idx = labels.indexOf(title); if(idx !== -1) items[idx].classList.add('active'); document.getElementById('mobile-title').innerText = title; if(window.innerWidth <= 768) toggleMenu(); }
@@ -321,18 +305,15 @@
     const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
     let custNames = [], agingNames = [];
-    
-    // VARIABEL GLOBAL UNTUK SORTIR PELANGGAN
-    let custSortCol = 's'; 
-    let custSortDir = 1;
+    let custSortCol = 's', custSortDir = 1;
 
     async function handleLogin() {
         const pinInput = document.getElementById('inputPin').value;
         const loader = document.getElementById('loader-overlay');
         const pctText = document.getElementById('load-percent');
         loader.style.display = 'flex'; document.getElementById('pin-modal').style.display = 'none';
-        let progress = 0; pctText.innerText = "0%";
-        const timer = setInterval(() => { if (progress < 90) { progress += Math.floor(Math.random() * 5) + 1; if(progress > 90) progress = 90; pctText.innerText = progress + "%"; } }, 100);
+        let progress = 0;
+        const timer = setInterval(() => { if (progress < 90) { progress += 5; pctText.innerText = progress + "%"; } }, 100);
         try {
             const resp = await fetch(API_URL); const raw = await resp.json();
             if (pinInput !== String(raw.pin)) { clearInterval(timer); alert("PIN SALAH!"); location.reload(); return; }
@@ -340,17 +321,35 @@
             custNames = [...new Set(DATA_STORE.jual.map(d => d.Pelanggan).filter(Boolean))].sort((a,b) => a.localeCompare(b));
             agingNames = [...new Set(DATA_STORE.aging.map(d => d.PELANGGAN).filter(Boolean))].sort((a,b) => a.localeCompare(b));
             initAll(); clearInterval(timer); pctText.innerText = "100%";
-            setTimeout(() => { loader.style.opacity = '0'; setTimeout(() => { loader.style.display = 'none'; document.getElementById('mainWrapper').style.display = 'flex'; }, 300); }, 500);
+            setTimeout(() => { loader.style.display = 'none'; document.getElementById('mainWrapper').style.display = 'flex'; }, 500);
         } catch (e) { clearInterval(timer); alert("Gagal: " + e.message); location.reload(); }
     }
 
-    function initAll() { initOmzet(); initHarian(); initCust(); initAging(); }
+    function initAll() { 
+        initOmzet(); initHarian(); initCust(); initAging(); 
+        // Event Listener Scroll untuk Infinite Load
+        const scroller = document.getElementById('mainScrollContent');
+        scroller.addEventListener('scroll', () => {
+            if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 100) {
+                const activeTab = document.querySelector('.tab-pane.active').id;
+                if (activeTab === 'tab-pelanggan') { limitCust += gapLoad; renderCust(); }
+                if (activeTab === 'tab-aging') { limitAging += gapLoad; renderAging(); }
+            }
+        });
+    }
+
+    // Helper untuk reset limit saat filter berubah
+    function resetAndRender(type) {
+        if(type === 'cust') { limitCust = 50; renderCust(); }
+        if(type === 'aging') { limitAging = 50; renderAging(); }
+    }
 
     function initOmzet() {
         const yrs = [...new Set(DATA_STORE.jual.map(d => d.Tahun))].sort((a,b)=>b-a);
         const blns = [...new Set(DATA_STORE.jual.map(d => d.Bulan))].sort((a,b) => MONTHS.findIndex(m=>a.includes(m)) - MONTHS.findIndex(m=>b.includes(m)));
         const kats = [...new Set(DATA_STORE.jual.map(d => d.Kategori))].sort();
-        fillSel('omzet-thn', yrs); fillSel('omzet-bln', blns); populateCheck('omzet-dropKat', kats, 'chk-o-kat', renderOmzet, ["DISTRIBUSI"]);
+        fillSel('omzet-thn', yrs); fillSel('omzet-bln', blns); 
+        populateCheck('omzet-dropKat', kats, 'chk-o-kat', renderOmzet, ["DISTRIBUSI"]);
         setDef('omzet-thn', 'omzet-bln', blns); renderOmzet();
     }
     function renderOmzet() {
@@ -383,14 +382,9 @@
         document.getElementById('harian-body').innerHTML = h; document.getElementById('harian-tJual').innerText = fmt(tJ); document.getElementById('harian-tBayar').innerText = fmt(tB);
     }
 
-    // FUNGSI SORTIR PELANGGAN
     function sortCust(col) {
-        if (custSortCol === col) {
-            custSortDir *= -1;
-        } else {
-            custSortCol = col;
-            custSortDir = 1;
-        }
+        if (custSortCol === col) custSortDir *= -1;
+        else { custSortCol = col; custSortDir = 1; }
         renderCust();
     }
 
@@ -398,10 +392,11 @@
         const yrs = [...new Set(DATA_STORE.jual.map(d => d.Tahun))].sort((a,b)=>b-a);
         const sls = [...new Set(DATA_STORE.jual.map(d => d.Sales))].sort();
         const blns = [...new Set(DATA_STORE.jual.map(d => d.Bulan))].sort((a,b) => MONTHS.findIndex(m=>a.includes(m)) - MONTHS.findIndex(m=>b.includes(m)));
-        fillSel('cust-thn', yrs); populateCheck('cust-dropSales', sls, 'chk-c-sls', renderCust); populateCheck('cust-dropBln', blns, 'chk-c-bln', renderCust);
+        fillSel('cust-thn', yrs); 
+        populateCheck('cust-dropSales', sls, 'chk-c-sls', () => resetAndRender('cust')); 
+        populateCheck('cust-dropBln', blns, 'chk-c-bln', () => resetAndRender('cust'));
         document.getElementById('cust-thn').value = new Date().getFullYear();
-        document.getElementById('cust-search').addEventListener('input', () => showAutocomplete('cust', document.getElementById('cust-search').value));
-        document.getElementById('cust-search').addEventListener('focus', () => showAutocomplete('cust', document.getElementById('cust-search').value));
+        document.getElementById('cust-search').addEventListener('input', () => { resetAndRender('cust'); showAutocomplete('cust', document.getElementById('cust-search').value); });
         renderCust();
     }
     function renderCust() {
@@ -412,30 +407,24 @@
         const group = {}; let grand = 0;
         filtered.forEach(d => { const k = d.Pelanggan + d.Bulan; if(!group[k]) group[k] = { s: d.Sales, p: d.Pelanggan, b: d.Bulan, v: 0 }; const v = parseFloat(d["Jumlah (Inc)"])||0; group[k].v += v; grand += v; });
         const arr = Object.values(group);
-        
-        // LOGIKA SORTIR DINAMIS
         arr.sort((a, b) => {
-            let valA = a[custSortCol];
-            let valB = b[custSortCol];
-            if (custSortCol === 'v') {
-                return (valA - valB) * custSortDir;
-            } else if (custSortCol === 'b') {
-                return (MONTHS.indexOf(valA.substring(0,3)) - MONTHS.indexOf(valB.substring(0,3))) * custSortDir;
-            } else {
-                return valA.localeCompare(valB) * custSortDir;
-            }
+            let valA = a[custSortCol], valB = b[custSortCol];
+            if (custSortCol === 'v') return (valA - valB) * custSortDir;
+            if (custSortCol === 'b') return (MONTHS.indexOf(valA.substring(0,3)) - MONTHS.indexOf(valB.substring(0,3))) * custSortDir;
+            return valA.localeCompare(valB) * custSortDir;
         });
-
-        document.getElementById('cust-body').innerHTML = arr.map(i => `<tr><td>${i.s}</td><td class="col-cust" onclick="toggleText(this)">${i.p}</td><td>${i.b}</td><td class="text-right">${fmt(i.v)}</td></tr>`).join('');
+        // Tampilkan data terbatas (Infinite Scroll)
+        const partial = arr.slice(0, limitCust);
+        document.getElementById('cust-body').innerHTML = partial.map(i => `<tr><td>${i.s}</td><td class="col-cust" onclick="toggleText(this)">${i.p}</td><td>${i.b}</td><td class="text-right">${fmt(i.v)}</td></tr>`).join('');
         document.getElementById('cust-total').innerText = fmt(grand);
     }
 
     function initAging() {
         const sls = [...new Set(DATA_STORE.aging.map(d => d.SALES))].sort();
         const customOrder = ["1-30", "31-60", "61-90", "91-120", "121-150", ">150"];
-        populateCheck('aging-dropSales', sls, 'chk-a-sls', renderAging); populateCheck('aging-dropUmur', customOrder, 'chk-a-grp', renderAging); 
-        document.getElementById('aging-search').addEventListener('input', () => showAutocomplete('aging', document.getElementById('aging-search').value));
-        document.getElementById('aging-search').addEventListener('focus', () => showAutocomplete('aging', document.getElementById('aging-search').value));
+        populateCheck('aging-dropSales', sls, 'chk-a-sls', () => resetAndRender('aging')); 
+        populateCheck('aging-dropUmur', customOrder, 'chk-a-grp', () => resetAndRender('aging')); 
+        document.getElementById('aging-search').addEventListener('input', () => { resetAndRender('aging'); showAutocomplete('aging', document.getElementById('aging-search').value); });
         renderAging();
     }
     function renderAging() {
@@ -444,8 +433,12 @@
         document.getElementById('aging-lblUmur').innerText = grps.length ? grps.length + " Grup" : "Semua";
         let filtered = DATA_STORE.aging.filter(d => (sls.length === 0 || sls.includes(d.SALES)) && (grps.length === 0 || grps.includes(d["UMUR GRUP"])) && (d.PELANGGAN && d.PELANGGAN.toLowerCase().includes(s)));
         filtered.sort((a, b) => { if (a.PELANGGAN !== b.PELANGGAN) return a.PELANGGAN.localeCompare(b.PELANGGAN); return parseInt(b.UMUR) - parseInt(a.UMUR); });
-        let h = "", total = 0;
-        filtered.forEach(d => { const v = parseFloat(d.JUMLAH)||0; total += v; const u = parseInt(d.UMUR)||0; h += `<tr><td class="col-cust" onclick="toggleText(this)">${d.PELANGGAN}</td><td>${d["NO FAKTUR"]||"-"}</td><td class="text-center">${fd(d["TGL FAKTUR"])}</td><td class="text-center ${u>=120?'text-red text-bold':''}">${u}</td><td class="text-right">${fmt(v)}</td></tr>`; });
+        
+        let total = 0; filtered.forEach(d => total += (parseFloat(d.JUMLAH)||0));
+        // Tampilkan data terbatas (Infinite Scroll)
+        const partial = filtered.slice(0, limitAging);
+        let h = "";
+        partial.forEach(d => { const v = parseFloat(d.JUMLAH)||0; const u = parseInt(d.UMUR)||0; h += `<tr><td class="col-cust" onclick="toggleText(this)">${d.PELANGGAN}</td><td>${d["NO FAKTUR"]||"-"}</td><td class="text-center">${fd(d["TGL FAKTUR"])}</td><td class="text-center ${u>=120?'text-red text-bold':''}">${u}</td><td class="text-right">${fmt(v)}</td></tr>`; });
         document.getElementById('aging-body').innerHTML = h; document.getElementById('aging-total').innerText = fmt(total);
     }
 
@@ -454,7 +447,7 @@
         listEl.innerHTML = ''; if (!query.trim()) { listEl.style.display = 'none'; return; }
         const matches = names.filter(n => n.toLowerCase().includes(query.toLowerCase())).slice(0, 10);
         if (matches.length === 0) { listEl.style.display = 'none'; return; }
-        matches.forEach(name => { const item = document.createElement('div'); item.className = 'autocomplete-item'; item.textContent = name; item.onclick = () => { if (type === 'cust') { document.getElementById('cust-search').value = name; renderCust(); } else { document.getElementById('aging-search').value = name; renderAging(); } listEl.style.display = 'none'; }; listEl.appendChild(item); });
+        matches.forEach(name => { const item = document.createElement('div'); item.className = 'autocomplete-item'; item.textContent = name; item.onclick = () => { if (type === 'cust') { document.getElementById('cust-search').value = name; resetAndRender('cust'); } else { document.getElementById('aging-search').value = name; resetAndRender('aging'); } listEl.style.display = 'none'; }; listEl.appendChild(item); });
         listEl.style.display = 'block';
     }
 
