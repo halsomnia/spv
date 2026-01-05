@@ -470,7 +470,19 @@
         document.getElementById('aging-lblSales').innerText = sls.length + " Sls";
         document.getElementById('aging-lblUmur').innerText = grps.length + " Grp";
 
-        const filtered = DATA_STORE.aging.filter(d => sls.includes(d.SALES) && grps.includes(d["UMUR GRUP"]) && (d.PELANGGAN||"").toLowerCase().includes(s));
+        const filtered = DATA_STORE.aging
+		.filter(d => sls.includes(d.SALES) && grps.includes(d["UMUR GRUP"]) && (d.PELANGGAN||"").toLowerCase().includes(s))
+		.sort((a, b) => {
+        // Pertama, urutkan berdasarkan Nama Pelanggan (A-Z)
+        const nameA = (a.PELANGGAN || "").toLowerCase();
+        const nameB = (b.PELANGGAN || "").toLowerCase();
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+
+        // Kedua, jika nama pelanggan sama, urutkan berdasarkan Umur (Besar ke Kecil)
+        return (parseInt(b.UMUR) || 0) - (parseInt(a.UMUR) || 0);
+		});
+				
         let total = 0; filtered.forEach(d => total += (parseFloat(d.JUMLAH)||0));
         
         document.getElementById('aging-body').innerHTML = filtered.slice(0, limitAging).map(d => {
@@ -513,7 +525,7 @@
     function getChecks(cls) { return Array.from(document.querySelectorAll('.'+cls+':checked')).map(i => i.value); }
     function fmt(n) { return Math.round(n||0).toLocaleString('id-ID'); }
     function df(n) { return n > 0 ? fmt(n) : '-'; }
-    function fd(s) { if(!s || s === "(blank)") return "-"; const d = new Date(s); return isNaN(d) ? s : `${d.getDate()}-${MONTHS[d.getMonth()]}`; }
+    function fd(s) { if(!s || s === "(blank)") return "-"; const d = new Date(s); return isNaN(d) ? s : `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; }
     function fillSel(id, arr) { const s = document.getElementById(id); s.innerHTML = ""; arr.forEach(v => s.innerHTML += `<option value="${v}">${v}</option>`); }
     function setDef(idT, idB, blns) { const now = new Date(); document.getElementById(idT).value = now.getFullYear(); const m = blns.find(x => x.includes(MONTHS[now.getMonth()])); if(m) document.getElementById(idB).value = m; }
     function resetAndRender(t) { if(t==='cust') { limitCust=50; renderCust(); } else { limitAging=50; renderAging(); } }
@@ -562,4 +574,3 @@
 </script>
 </body>
 </html>
-
