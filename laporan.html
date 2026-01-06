@@ -113,6 +113,17 @@
         #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2600; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(255, 255, 255, 0.92); }
         .spinner-ring { width: 60px; height: 60px; border: 6px solid rgba(0, 0, 0, 0.1); border-top: 6px solid var(--primary-black); border-radius: 50%; animation: spin 1s infinite linear; margin-bottom: 15px; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* MODAL & PROFILE STYLES */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 3000; }
+        .modal-box { background: #fff; width: 95%; max-width: 600px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-header { padding: 15px 20px; background: var(--primary-black); color: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
+        
+        .profile-card { background: #f8f9fa; border-left: 4px solid var(--primary-black); padding: 15px; border-radius: 8px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .profile-label { font-size: 0.65em; color: #888; font-weight: 700; text-transform: uppercase; }
+        .profile-value { font-size: 0.85em; color: #333; font-weight: 500; margin-top: 2px; }
+        .clickable-name { color: #1a73e8; cursor: pointer; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -270,10 +281,44 @@
         </div>
     </div>
 
+    <div id="detail-modal" class="modal-overlay" onclick="this.style.display='none'">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div id="modal-title" style="font-weight:700;">Detail Pelanggan</div>
+                <button onclick="document.getElementById('detail-modal').style.display='none'" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-card">
+                    <div style="grid-column: span 2;">
+                        <div class="profile-label">Alamat</div>
+                        <div id="p-alamat" class="profile-value">-</div>
+                    </div>
+                    <div>
+                        <div class="profile-label">Kota</div>
+                        <div id="p-kota" class="profile-value">-</div>
+                    </div>
+                    <div>
+                        <div class="profile-label">Day</div>
+                        <div id="p-day" class="profile-value" style="color:#d32f2f; font-weight:700;">-</div>
+                    </div>
+                    <div>
+                        <div class="profile-label">SPV</div>
+                        <div id="p-spv" class="profile-value">-</div>
+                    </div>
+                    <div>
+                        <div class="profile-label">Sales</div>
+                        <div id="p-sales" class="profile-value">-</div>
+                    </div>
+                </div>
+                <div class="table-wrapper" id="modal-table-content"></div>
+            </div>
+        </div>
+    </div>
+
 <script>
     /* --- CONFIG & DATA --- */
-    const API_URL = "https://script.google.com/macros/s/AKfycbxOkSTAB0rMkpicHZeCTdsYrmu8Qh65y52r--2m2Ju2NomE1ir2lKkZRjWtrZw7dX0n/exec";
-    const DATA_STORE = { jual: [], bayar: [], target: [], aging: [] };
+    const API_URL = "https://script.google.com/macros/s/AKfycbxdM5xVkrpd9WqqK6Ffn42_fNdbCz2vLMcIu0b0jxpO9bnqJDWUfRNM4z-Eyst3HFa7/exec";
+    const DATA_STORE = { jual: [], bayar: [], target: [], aging: [], masterPelanggan: [] };
     const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     
     let limitCust = 50, limitAging = 50, gapLoad = 50;
@@ -305,6 +350,7 @@
             DATA_STORE.bayar = data.pembayaran;
             DATA_STORE.target = data.target;
             DATA_STORE.aging = data.aging;
+            DATA_STORE.masterPelanggan = data.masterPelanggan;
 
             custNames = [...new Set(DATA_STORE.jual.map(d => d.Pelanggan).filter(Boolean))].sort();
             agingNames = [...new Set(DATA_STORE.aging.map(d => d.PELANGGAN).filter(Boolean))].sort();
@@ -473,13 +519,10 @@
         const filtered = DATA_STORE.aging
 		.filter(d => sls.includes(d.SALES) && grps.includes(d["UMUR GRUP"]) && (d.PELANGGAN||"").toLowerCase().includes(s))
 		.sort((a, b) => {
-        // Pertama, urutkan berdasarkan Nama Pelanggan (A-Z)
         const nameA = (a.PELANGGAN || "").toLowerCase();
         const nameB = (b.PELANGGAN || "").toLowerCase();
         if (nameA < nameB) return -1;
         if (nameA > nameB) return 1;
-
-        // Kedua, jika nama pelanggan sama, urutkan berdasarkan Umur (Besar ke Kecil)
         return (parseInt(b.UMUR) || 0) - (parseInt(a.UMUR) || 0);
 		});
 				
@@ -487,20 +530,48 @@
         
         document.getElementById('aging-body').innerHTML = filtered.slice(0, limitAging).map(d => {
             const u = parseInt(d.UMUR)||0;
-            return `<tr><td>${d.PELANGGAN}</td><td>${d["NO FAKTUR"]||"-"}</td><td class="text-center">${fd(d["TGL FAKTUR"])}</td><td class="text-center ${u>=120?'text-red text-bold':''}">${u}</td><td class="text-right">${fmt(d.JUMLAH)}</td></tr>`;
+            return `<tr><td class="clickable-name" onclick="showDetail('${d.PELANGGAN}')">${d.PELANGGAN}</td><td>${d["NO FAKTUR"]||"-"}</td><td class="text-center">${fd(d["TGL FAKTUR"])}</td><td class="text-center ${u>=120?'text-red text-bold':''}">${u}</td><td class="text-right">${fmt(d.JUMLAH)}</td></tr>`;
         }).join('');
         document.getElementById('aging-total').innerText = fmt(total);
     }
 
+	/* --- DETAIL POPUP LOGIC --- */
+	function showDetail(nama) {
+		// 1. Mencari profil di masterPelanggan (Data dari Sheet6)
+		const profil = DATA_STORE.masterPelanggan.find(p => p.Pelanggan === nama);
+		
+		// 2. Mengisi UI Modal dengan data dari masterPelanggan
+		document.getElementById('p-alamat').innerText = profil ? (profil.Alamat || "-") : "-";
+		document.getElementById('p-kota').innerText = profil ? (profil.Kota || "-") : "-";
+		document.getElementById('p-day').innerText = profil ? (profil.Day || "-") : "-";
+		
+		// Mengambil SPV (Kolom E) dan Sales (Kolom D) dari Sheet6
+		document.getElementById('p-spv').innerText = profil ? (profil.SPV || "-") : "-";
+		document.getElementById('p-sales').innerText = profil ? (profil.Sales || "-") : "-";
+
+		// 3. Menampilkan daftar faktur piutang (Data dari Sheet Aging)
+		const det = DATA_STORE.aging.filter(d => d.PELANGGAN === nama);
+		let total = 0, html = `<table><thead><tr><th>No Faktur</th><th class="text-center">Tgl</th><th class="text-right">Jumlah</th></tr></thead><tbody>`;
+		
+		det.forEach(d => {
+			total += (parseFloat(d.JUMLAH) || 0);
+			html += `<tr><td>${d["NO FAKTUR"] || "-"}</td><td class="text-center">${fd(d["TGL FAKTUR"])}</td><td class="text-right">${fmt(d.JUMLAH)}</td></tr>`;
+		});
+
+		html += `</tbody><tfoot><tr class="row-total"><td colspan="2">TOTAL PIUTANG</td><td class="text-right">${fmt(total)}</td></tr></tfoot></table>`;
+		
+		document.getElementById('modal-title').innerText = nama;
+		document.getElementById('modal-table-content').innerHTML = html;
+		document.getElementById('detail-modal').style.display = 'flex';
+	}
+
     /* --- UTILS & UI --- */
     function populateCheck(id, items, cls, cb, exclude = []) {
         const d = document.getElementById(id); d.innerHTML = "";
-        
         const all = document.createElement('div');
         all.className = 'dropdown-item'; all.style.fontWeight = 'bold'; all.innerText = "Pilih Semua";
         all.onclick = (e) => { e.stopPropagation(); toggleAll(cls, cb); };
         d.appendChild(all);
-
         items.forEach(i => {
             const row = document.createElement('div');
             row.className = 'dropdown-item';
