@@ -155,7 +155,8 @@
             <div class="nav-item active" onclick="switchTab('tab-omzet', 'Pencapaian Omzet')">Omzet Target Sales</div>
             <div class="nav-item" onclick="switchTab('tab-harian', 'Penjualan Pembayaran')">Penjualan dan Pembayaran</div>
             <div class="nav-item" onclick="switchTab('tab-pelanggan', 'Penjualan Pelanggan')">Penjualan Pelanggan</div>
-            <div class="nav-item" onclick="switchTab('tab-aging', 'Aging Piutang')">Aging Piutang</div>
+            <div class="nav-item" onclick="switchTab('tab-aging', 'Aging Piutang')">Aging Piutang Detail</div>
+            <div class="nav-item" onclick="switchTab('tab-macet', 'Aging Piutang >120 H')">Aging Piutang >120 H</div>
         </div>
     </div>
 
@@ -278,6 +279,35 @@
                 </div>
             </div>
 
+            <div id="tab-macet" class="tab-pane">
+                <div class="report-card">
+                    <div class="report-header"><h1>Aging Piutang >120 H</h1></div>
+                    <div class="filter-group">
+                        <div class="filter-item"><span class="filter-label">Spv</span>
+                            <div style="position:relative;">
+                                <div class="dropdown-btn" onclick="toggleDrop('macet-dropSpv')"><span id="macet-lblSpv">Pilih...</span> ▼</div>
+                                <div id="macet-dropSpv" class="dropdown-content"></div>
+                            </div>
+                        </div>
+                        <div class="filter-item"><span class="filter-label">Day</span>
+                            <div style="position:relative;">
+                                <div class="dropdown-btn" onclick="toggleDrop('macet-dropDay')"><span id="macet-lblDay">Pilih...</span> ▼</div>
+                                <div id="macet-dropDay" class="dropdown-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>Spv</th><th>Sales</th><th>Pelanggan</th><th class="text-right">Jumlah</th></tr>
+                            </thead>
+                            <tbody id="macet-body"></tbody>
+                            <tfoot><tr class="row-total"><td colspan="3" class="text-center">GRAND TOTAL</td><td class="text-right" id="macet-total">0</td></tr></tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -374,6 +404,7 @@
         initHarian();
         initCust();
         initAging();
+        initMacet();
 
         document.getElementById('mainScrollContent').onscroll = function() {
             if (this.scrollTop + this.clientHeight >= this.scrollHeight - 50) {
@@ -537,19 +568,14 @@
 
 	/* --- DETAIL POPUP LOGIC --- */
 	function showDetail(nama) {
-		// 1. Mencari profil di masterPelanggan (Data dari Sheet6)
 		const profil = DATA_STORE.masterPelanggan.find(p => p.Pelanggan === nama);
 		
-		// 2. Mengisi UI Modal dengan data dari masterPelanggan
 		document.getElementById('p-alamat').innerText = profil ? (profil.Alamat || "-") : "-";
 		document.getElementById('p-kota').innerText = profil ? (profil.Kota || "-") : "-";
 		document.getElementById('p-day').innerText = profil ? (profil.Day || "-") : "-";
-		
-		// Mengambil SPV (Kolom E) dan Sales (Kolom D) dari Sheet6
 		document.getElementById('p-spv').innerText = profil ? (profil.SPV || "-") : "-";
 		document.getElementById('p-sales').innerText = profil ? (profil.Sales || "-") : "-";
 
-		// 3. Menampilkan daftar faktur piutang (Data dari Sheet Aging)
 		const det = DATA_STORE.aging.filter(d => d.PELANGGAN === nama);
 		let total = 0, html = `<table><thead><tr><th>No Faktur</th><th class="text-center">Tgl</th><th class="text-right">Jumlah</th></tr></thead><tbody>`;
 		
@@ -564,6 +590,70 @@
 		document.getElementById('modal-table-content').innerHTML = html;
 		document.getElementById('detail-modal').style.display = 'flex';
 	}
+
+    /* --- TAB: MACET (>120 H) --- */
+    function initMacet() {
+        const days = [...new Set(DATA_STORE.masterPelanggan.map(p => p.Day || "(No Day)"))].sort();
+        const spvs = [...new Set(DATA_STORE.masterPelanggan.map(p => p.SPV || "(No SPV)"))].sort();
+        
+        populateCheck('macet-dropDay', days, 'chk-m-day', renderMacet);
+        populateCheck('macet-dropSpv', spvs, 'chk-m-spv', renderMacet);
+
+        renderMacet();
+    }
+
+    function renderMacet() {
+        const selectedDays = getChecks('chk-m-day');
+        const selectedSpvs = getChecks('chk-m-spv');
+        
+        document.getElementById('macet-lblDay').innerText = selectedDays.length + " Day";
+        document.getElementById('macet-lblSpv').innerText = selectedSpvs.length + " Spv";
+
+        const macetData = DATA_STORE.aging.filter(d => (parseInt(d.UMUR) || 0) >= 120);
+        const masterMap = {};
+        DATA_STORE.masterPelanggan.forEach(p => masterMap[p.Pelanggan] = p);
+
+        const grouped = {};
+        let grandTotal = 0;
+
+        macetData.forEach(d => {
+            const profil = masterMap[d.PELANGGAN];
+            const day = profil && profil.Day ? profil.Day : "(No Day)";
+            const spv = profil && profil.SPV ? profil.SPV : "(No SPV)";
+            
+            if (!selectedDays.includes(day)) return;
+            if (!selectedSpvs.includes(spv)) return;
+
+            if (!grouped[d.PELANGGAN]) {
+                grouped[d.PELANGGAN] = {
+                    spv: spv,
+                    sales: d.SALES || "-",
+                    nama: d.PELANGGAN,
+                    jumlah: 0
+                };
+            }
+            const val = parseFloat(d.JUMLAH) || 0;
+            grouped[d.PELANGGAN].jumlah += val;
+        });
+
+        const result = Object.values(grouped)
+            .filter(i => i.jumlah > 0)
+            .sort((a, b) => {
+                const cmpSpv = a.spv.localeCompare(b.spv);
+                if (cmpSpv !== 0) return cmpSpv;
+                const cmpSales = a.sales.localeCompare(b.sales);
+                if (cmpSales !== 0) return cmpSales;
+                return a.nama.localeCompare(b.nama);
+            });
+
+        result.forEach(i => grandTotal += i.jumlah);
+
+        document.getElementById('macet-body').innerHTML = result.map(i => 
+            `<tr><td>${i.spv}</td><td>${i.sales}</td><td class="clickable-name" onclick="showDetail('${i.nama}')">${i.nama}</td><td class="text-right">${fmt(i.jumlah)}</td></tr>`
+        ).join('');
+        
+        document.getElementById('macet-total').innerText = fmt(grandTotal);
+    }
 
     /* --- UTILS & UI --- */
     function populateCheck(id, items, cls, cb, exclude = []) {
@@ -614,6 +704,7 @@
         Array.from(document.querySelectorAll('.nav-item')).find(i => i.innerText === title).classList.add('active');
         document.getElementById('mobile-title').innerText = title;
         if(window.innerWidth <= 768) toggleMenu();
+        if(id === 'tab-macet') renderMacet();
     }
 
     function toggleMenu() {
