@@ -78,6 +78,10 @@
         tr:nth-child(even) { background: var(--light-gray); }
         .row-total td { background: var(--primary-black) !important; color: #fff; font-weight: 700; position: sticky; bottom: 0; z-index: 10; }
         
+        /* Tambahan Garis Vertikal Tabel */
+        .with-vertical-border th, .with-vertical-border td { border-right: 1px solid #ddd; }
+        .with-vertical-border th:last-child, .with-vertical-border td:last-child { border-right: none; }
+
         .text-right { text-align: right; }
         .text-center { text-align: center; }
         .text-bold { font-weight: 700; }
@@ -124,6 +128,12 @@
         .profile-label { font-size: 0.65em; color: #888; font-weight: 700; text-transform: uppercase; }
         .profile-value { font-size: 0.85em; color: #333; font-weight: 500; margin-top: 2px; }
         .clickable-name { color: #1a73e8; cursor: pointer; text-decoration: none; }
+
+        /* Style khusus tabel ringkasan harian */
+        .summary-table { width: 100%; border: 1px solid #000; margin-top: 25px; }
+        .summary-table th, .summary-table td { border-right: 1px solid #ccc; }
+        .summary-table th:last-child, .summary-table td:last-child { border-right: none; }
+        .summary-table .row-total-custom td { background: var(--primary-black); color: #fff; font-weight: 700; border-right: 1px solid #444; border-bottom: none; font-size: 1em; }
     </style>
 </head>
 <body>
@@ -196,13 +206,39 @@
                         <div class="filter-item"><span class="filter-label">Bln</span><select id="harian-bln" onchange="renderHarian()"></select></div>
                     </div>
                     <div class="table-wrapper">
-                        <table>
+                        <table class="with-vertical-border">
                             <thead>
-                                <tr><th rowspan="2" class="text-center">Tgl</th><th colspan="2" class="text-center">Penjualan</th><th colspan="2" class="text-center">Pembayaran</th></tr>
-                                <tr><th class="text-center">BDG</th><th class="text-center">CRB</th><th class="text-center">BDG</th><th class="text-center">CRB</th></tr>
+                                <tr><th rowspan="2" class="text-center">TANGGAL</th><th colspan="2" class="text-center">PENJUALAN</th><th colspan="2" class="text-center">PEMBAYARAN</th></tr>
+                                <tr><th class="text-center">BANDUNG</th><th class="text-center">CIREBON</th><th class="text-center">BANDUNG</th><th class="text-center">CIREBON</th></tr>
                             </thead>
                             <tbody id="harian-body"></tbody>
-                            <tfoot><tr class="row-total"><td>TOTAL</td><td colspan="2" class="text-right" id="harian-tJual">0</td><td colspan="2" class="text-right" id="harian-tBayar">0</td></tr></tfoot>
+                        </table>
+
+                        <table class="summary-table">
+                            <thead>
+                                <tr style="background: var(--primary-black); color: #fff;">
+                                    <th class="text-center" style="width: 34%;">GUDANG</th>
+                                    <th class="text-center" style="width: 33%;">PENJUALAN</th>
+                                    <th class="text-center" style="width: 33%;">PEMBAYARAN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #fff; color: #000;">
+                                    <td class="text-center">Bandung</td>
+                                    <td class="text-right" id="harian-tJualBdg">0</td>
+                                    <td class="text-right" id="harian-tBayarBdg">0</td>
+                                </tr>
+                                <tr style="background: #f9f9f9; color: #000;">
+                                    <td class="text-center">Cirebon</td>
+                                    <td class="text-right" id="harian-tJualCrb">0</td>
+                                    <td class="text-right" id="harian-tBayarCrb">0</td>
+                                </tr>
+                                <tr class="row-total-custom">
+                                    <td class="text-center">GRAND TOTAL</td>
+                                    <td class="text-right" id="harian-tJualTotal">0</td>
+                                    <td class="text-right" id="harian-tBayarTotal">0</td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -462,7 +498,6 @@
             const pS = sT > 0 ? Math.round(sR/sT*100) : 0;
             html += rows + `<tr class="row-total"><td>${spv}</td><td class="text-right">${fmt(sT)}</td><td class="text-right">${fmt(sR)}</td><td class="text-center">${pS}%</td><td class="text-right">${df(sT*0.7-sR)}</td><td class="text-right">${df(sT*0.8-sR)}</td><td class="text-right">${df(sT-sR)}</td></tr>`;
             
-            // Tambahkan baris pemisah transparan jika bukan SPV terakhir
             if (index < spvList.length - 1) {
                 html += `<tr style="height:20px; background:transparent;"><td colspan="7" style="border:none;"></td></tr>`;
             }
@@ -482,29 +517,46 @@
 
     function renderHarian() {
         const thn = document.getElementById('harian-thn').value;
-        const bln = document.getElementById('harian-bln').value;
-        document.getElementById('harian-sub').innerText = `${bln} ${thn}`;
+        const blnStr = document.getElementById('harian-bln').value;
+        const blnIdx = MONTHS.findIndex(m => blnStr.includes(m));
+        document.getElementById('harian-sub').innerText = `${blnStr} ${thn}`;
         
         const map = {};
-        DATA_STORE.jual.filter(d => String(d.Tahun) === thn && d.Bulan === bln).forEach(d => {
-            const k = new Date(d["Tgl Faktur"]).toDateString();
+        DATA_STORE.jual.filter(d => String(d.Tahun) == thn && d.Bulan === blnStr).forEach(d => {
+            const k = new Date(d["Tgl Faktur"]).getDate();
             if(!map[k]) map[k] = { jB:0, jC:0, bB:0, bC:0 };
             if(d.Gudang === "BANDUNG") map[k].jB += (parseFloat(d["Jumlah (Inc)"])||0); else map[k].jC += (parseFloat(d["Jumlah (Inc)"])||0);
         });
-        DATA_STORE.bayar.filter(d => String(d.Tahun) === thn && d.Bulan === bln).forEach(d => {
-            const k = new Date(d["Tanggal"]).toDateString();
+        DATA_STORE.bayar.filter(d => String(d.Tahun) == thn && d.Bulan === blnStr).forEach(d => {
+            const k = new Date(d["Tanggal"]).getDate();
             if(!map[k]) map[k] = { jB:0, jC:0, bB:0, bC:0 };
             if(d.Gudang === "BANDUNG") map[k].bB += (parseFloat(d["Jumlah Bayar"])||0); else map[k].bC += (parseFloat(d["Jumlah Bayar"])||0);
         });
 
-        let h = "", tJ = 0, tB = 0;
-        Object.keys(map).sort((a,b)=>new Date(a)-new Date(b)).forEach(k => {
-            const d = map[k], dt = new Date(k); tJ += (d.jB+d.jC); tB += (d.bB+d.bC);
-            h += `<tr><td class="text-center">${dt.getDate()}-${MONTHS[dt.getMonth()]}</td><td class="text-right">${fmt(d.jB)}</td><td class="text-right">${fmt(d.jC)}</td><td class="text-right text-green">${fmt(d.bB)}</td><td class="text-right text-green">${fmt(d.bC)}</td></tr>`;
-        });
+        const today = new Date();
+        const lastDayInMonth = new Date(thn, blnIdx + 1, 0).getDate();
+        let limitDay = lastDayInMonth;
+        if(parseInt(thn) === today.getFullYear() && blnIdx === today.getMonth()) {
+            limitDay = today.getDate();
+        }
+
+        let h = "";
+        let sumJB = 0, sumJC = 0, sumBB = 0, sumBC = 0;
+
+        for (let i = 1; i <= limitDay; i++) {
+            const d = map[i] || { jB:0, jC:0, bB:0, bC:0 };
+            sumJB += d.jB; sumJC += d.jC; sumBB += d.bB; sumBC += d.bC;
+            h += `<tr><td class="text-center">${i}-${MONTHS[blnIdx]}</td><td class="text-right">${fmt(d.jB)}</td><td class="text-right">${fmt(d.jC)}</td><td class="text-right text-green">${fmt(d.bB)}</td><td class="text-right text-green">${fmt(d.bC)}</td></tr>`;
+        }
+        
         document.getElementById('harian-body').innerHTML = h;
-        document.getElementById('harian-tJual').innerText = fmt(tJ);
-        document.getElementById('harian-tBayar').innerText = fmt(tB);
+        
+        document.getElementById('harian-tJualBdg').innerText = fmt(sumJB);
+        document.getElementById('harian-tBayarBdg').innerText = fmt(sumBB);
+        document.getElementById('harian-tJualCrb').innerText = fmt(sumJC);
+        document.getElementById('harian-tBayarCrb').innerText = fmt(sumBC);
+        document.getElementById('harian-tJualTotal').innerText = fmt(sumJB + sumJC);
+        document.getElementById('harian-tBayarTotal').innerText = fmt(sumBB + sumBC);
     }
 
     /* --- TAB: CUST & AGING --- */
@@ -572,10 +624,8 @@
         document.getElementById('aging-total').innerText = fmt(total);
     }
 
-	/* --- DETAIL POPUP LOGIC --- */
 	function showDetail(nama) {
 		const profil = DATA_STORE.masterPelanggan.find(p => p.Pelanggan === nama);
-		
 		document.getElementById('p-alamat').innerText = profil ? (profil.Alamat || "-") : "-";
 		document.getElementById('p-kota').innerText = profil ? (profil.Kota || "-") : "-";
 		document.getElementById('p-day').innerText = profil ? (profil.Day || "-") : "-";
@@ -584,84 +634,61 @@
 
 		const det = DATA_STORE.aging.filter(d => d.PELANGGAN === nama);
 		let total = 0, html = `<table><thead><tr><th>No Faktur</th><th class="text-center">Tgl</th><th class="text-right">Jumlah</th></tr></thead><tbody>`;
-		
 		det.forEach(d => {
 			total += (parseFloat(d.JUMLAH) || 0);
 			html += `<tr><td>${d["NO FAKTUR"] || "-"}</td><td class="text-center">${fd(d["TGL FAKTUR"])}</td><td class="text-right">${fmt(d.JUMLAH)}</td></tr>`;
 		});
-
 		html += `</tbody><tfoot><tr class="row-total"><td colspan="2">TOTAL PIUTANG</td><td class="text-right">${fmt(total)}</td></tr></tfoot></table>`;
-		
 		document.getElementById('modal-title').innerText = nama;
 		document.getElementById('modal-table-content').innerHTML = html;
 		document.getElementById('detail-modal').style.display = 'flex';
 	}
 
-    /* --- TAB: MACET (>120 H) --- */
     function initMacet() {
         const days = [...new Set(DATA_STORE.masterPelanggan.map(p => p.Day || "(No Day)"))].sort();
         const spvs = [...new Set(DATA_STORE.masterPelanggan.map(p => p.SPV || "(No SPV)"))].sort();
-        
         populateCheck('macet-dropDay', days, 'chk-m-day', renderMacet);
         populateCheck('macet-dropSpv', spvs, 'chk-m-spv', renderMacet);
-
         renderMacet();
     }
 
     function renderMacet() {
         const selectedDays = getChecks('chk-m-day');
         const selectedSpvs = getChecks('chk-m-spv');
-        
         document.getElementById('macet-lblDay').innerText = selectedDays.length + " Day";
         document.getElementById('macet-lblSpv').innerText = selectedSpvs.length + " Spv";
-
         const macetData = DATA_STORE.aging.filter(d => (parseInt(d.UMUR) || 0) >= 120);
         const masterMap = {};
         DATA_STORE.masterPelanggan.forEach(p => masterMap[p.Pelanggan] = p);
-
         const grouped = {};
         let grandTotal = 0;
-
         macetData.forEach(d => {
             const profil = masterMap[d.PELANGGAN];
             const day = profil && profil.Day ? profil.Day : "(No Day)";
             const spv = profil && profil.SPV ? profil.SPV : "(No SPV)";
-            
             if (!selectedDays.includes(day)) return;
             if (!selectedSpvs.includes(spv)) return;
-
             if (!grouped[d.PELANGGAN]) {
-                grouped[d.PELANGGAN] = {
-                    spv: spv,
-                    sales: d.SALES || "-",
-                    nama: d.PELANGGAN,
-                    jumlah: 0
-                };
+                grouped[d.PELANGGAN] = { spv: spv, sales: d.SALES || "-", nama: d.PELANGGAN, jumlah: 0 };
             }
             const val = parseFloat(d.JUMLAH) || 0;
             grouped[d.PELANGGAN].jumlah += val;
         });
-
-        const result = Object.values(grouped)
-            .filter(i => i.jumlah > 0)
-            .sort((a, b) => {
-                const cmpSpv = a.spv.localeCompare(b.spv);
-                if (cmpSpv !== 0) return cmpSpv;
-                const cmpSales = a.sales.localeCompare(b.sales);
-                if (cmpSales !== 0) return cmpSales;
-                return a.nama.localeCompare(b.nama);
-            });
-
+        const result = Object.values(grouped).filter(i => i.jumlah > 0).sort((a, b) => {
+            const cmpSpv = a.spv.localeCompare(b.spv);
+            if (cmpSpv !== 0) return cmpSpv;
+            const cmpSales = a.sales.localeCompare(b.sales);
+            if (cmpSales !== 0) return cmpSales;
+            return a.nama.localeCompare(b.nama);
+        });
         result.forEach(i => grandTotal += i.jumlah);
-
         document.getElementById('macet-body').innerHTML = result.map(i => 
             `<tr><td>${i.spv}</td><td>${i.sales}</td><td class="clickable-name" onclick="showDetail('${i.nama}')">${i.nama}</td><td class="text-right">${fmt(i.jumlah)}</td></tr>`
         ).join('');
-        
         document.getElementById('macet-total').innerText = fmt(grandTotal);
     }
 
-    /* --- UTILS & UI --- */
+    /* --- UTILS --- */
     function populateCheck(id, items, cls, cb, exclude = []) {
         const d = document.getElementById(id); d.innerHTML = "";
         const all = document.createElement('div');
@@ -710,7 +737,6 @@
         Array.from(document.querySelectorAll('.nav-item')).find(i => i.innerText === title).classList.add('active');
         document.getElementById('mobile-title').innerText = title;
         if(window.innerWidth <= 768) toggleMenu();
-        if(id === 'tab-macet') renderMacet();
     }
 
     function toggleMenu() {
