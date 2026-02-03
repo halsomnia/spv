@@ -451,7 +451,8 @@
         });
 
         let html = "";
-        Object.keys(groups).forEach(spv => {
+        const spvList = Object.keys(groups);
+        spvList.forEach((spv, index) => {
             let sT = 0, sR = 0, rows = "";
             groups[spv].forEach(s => {
                 const r = realMap[s.name]||0; sT += s.tgt; sR += r;
@@ -460,6 +461,11 @@
             });
             const pS = sT > 0 ? Math.round(sR/sT*100) : 0;
             html += rows + `<tr class="row-total"><td>${spv}</td><td class="text-right">${fmt(sT)}</td><td class="text-right">${fmt(sR)}</td><td class="text-center">${pS}%</td><td class="text-right">${df(sT*0.7-sR)}</td><td class="text-right">${df(sT*0.8-sR)}</td><td class="text-right">${df(sT-sR)}</td></tr>`;
+            
+            // Tambahkan baris pemisah transparan jika bukan SPV terakhir
+            if (index < spvList.length - 1) {
+                html += `<tr style="height:20px; background:transparent;"><td colspan="7" style="border:none;"></td></tr>`;
+            }
         });
         document.getElementById('omzet-body').innerHTML = html;
     }
