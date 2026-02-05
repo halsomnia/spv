@@ -79,7 +79,7 @@
         .row-total td { background: var(--primary-black) !important; color: #fff; font-weight: 700; position: sticky; bottom: 0; z-index: 10; }
         
         /* Tambahan Garis Vertikal Tabel */
-        .with-vertical-border th, .with-vertical-border td { border-right: 1px solid #ddd; }
+        .with-vertical-border th, .with-vertical-border td { border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; }
         .with-vertical-border th:last-child, .with-vertical-border td:last-child { border-right: none; }
 
         .text-right { text-align: right; }
@@ -131,7 +131,7 @@
 
         /* Style khusus tabel ringkasan harian */
         .summary-table { width: 100%; border: 1px solid #000; margin-top: 25px; }
-        .summary-table th, .summary-table td { border-right: 1px solid #ccc; }
+        .summary-table th, .summary-table td { border-right: 1px solid #ccc; border-bottom: 1px solid #ccc;}
         .summary-table th:last-child, .summary-table td:last-child { border-right: none; }
         .summary-table .row-total-custom td { background: var(--primary-black); color: #fff; font-weight: 700; border-right: 1px solid #444; border-bottom: none; font-size: 1em; }
     </style>
@@ -187,10 +187,10 @@
                         </div>
                     </div>
                     <div class="table-wrapper">
-                        <table>
+                        <table class="with-vertical-border">
                             <thead>
-                                <tr><th rowspan="2">Sales</th><th rowspan="2" class="text-right">Target</th><th rowspan="2" class="text-right">Jumlah</th><th rowspan="2" class="text-center">%</th><th colspan="3" class="text-center">Kurang</th></tr>
-                                <tr><th class="text-right">70%</th><th class="text-right">80%</th><th class="text-right">100%</th></tr>
+                                <tr><th rowspan="2" class="text-center">SALES</th><th rowspan="2" class="text-center">TARGET</th><th rowspan="2" class="text-center">JUMLAH</th><th rowspan="2" class="text-center">%</th><th colspan="3" class="text-center">KURANG</th></tr>
+                                <tr><th class="text-center">70%</th><th class="text-center">80%</th><th class="text-center">100%</th></tr>
                             </thead>
                             <tbody id="omzet-body"></tbody>
                         </table>
